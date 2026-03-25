@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vintix II</title>
+  <meta name="description" content="Vintix II is a new multi-domain action model capable of in-context adaptation ">
+  <link rel="preload" href="./fonts/GentiumPlus-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <style>
+    @font-face {
+      font-family: "GentiumPlus";
+      src: url("./fonts/GentiumPlus-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "GentiumPlus";
+      src: url("./fonts/GentiumPlus-Italic.ttf") format("truetype");
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "GentiumPlus";
+      src: url("./fonts/GentiumPlus-Bold.ttf") format("truetype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ------- Palette & layout (paper-like) ------- */
+    :root{
+      --bg: #fff;         /* changed to white */
+      --ink: #181716;        /* soft black */
+      --muted: #6a675f;      /* paragraph gray */
+      --line: #d9d4c7;       /* hairline */
+      --accent: #181716;     /* links keep ink color */
+      --container: 980px;
+      --radius: 10px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:auto}
+    html.smooth-scroll{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:var(--bg);
+      font-weight: 400;
+      font: 16px/1.65 "GentiumPlus";
+      text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+    }
+    .container{max-width:var(--container); margin:0 auto; padding:0 24px}
+
+    /* ------- Links & small UI ------- */
+    a{color:var(--accent); text-decoration:underline; text-underline-offset:2px}
+    a:hover{opacity:.85}
+    .pill{
+      display:inline-block; border:1px solid var(--ink); border-radius:6px;
+      padding:6px 10px; font: 13px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-decoration:none; background:transparent;
+    }
+
+    /* ------- Header ------- */
+    header{
+      border-bottom:1px solid var(--line);
+      background: var(--bg);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+    }
+    .head{
+      display:grid;
+      grid-template-columns: auto 1fr;
+      align-items:center;
+      height:86px;                 /* 10% shorter than 96px */
+      padding: 0 24px;
+    }
+    .brand{display:flex; align-items:center; font-weight:600; letter-spacing:.2px; font-size: 20px; color: #2F3677;}
+    .brand a{display:flex; align-items:center; text-decoration:none;}
+    .brand img{height: 75px;; width:auto; display:block;}  /* 1.25x from 36px */
+    .nav{
+      display:flex; justify-content: space-evenly; align-items:center; font-size:18px; gap:0
+    }
+    .nav a{
+      text-decoration:none; color:#2F3677; font-weight:400 !important; font-style: normal;
+    }
+
+    /* ------- Hero (updated with video background) ------- */
+    .hero{
+      position: relative;
+
+      /* account for fixed header and mobile browser bars */
+      height: calc(100vh - 86px);
+      height: calc(100svh - 86px);
+      height: calc(100dvh - 86px);
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      text-align: left;
+
+      /* move title/buttons higher */
+      padding: 0 0 clamp(12px, 4vh, 40px) 0;
+
+      overflow: hidden;
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      background: #fff;
+    }
+
+    .hero-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* hero stays as a background fill */
+      z-index: 0;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      padding: 0 24px;
+    }
+    h1{
+      font-size: clamp(32px, 6vw, 56px);
+      line-height:1.08; margin:.15em 0 .4em 0; letter-spacing:-0.01em;
+      color: #2F3677;
+    }
+    .meta{
+      font-size:15px; color: #ddd; display:grid; gap:6px; margin:14px 0 12px;
+    }
+    .hero-actions{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 0; justify-content: flex-start;}
+    .hero-actions .pill {
+      background: #ECECEC;
+      border: 1px solid #D56131;
+      color: #2F3677;
+      border-radius: 10px;
+      padding: 9px 15px;
+      font-size: 19.5px;
+    }
+    .hero-actions .pill:hover {
+      background: #ECECEC;
+      opacity: 0.85;
+    }
+
+    /* ------- Figure placeholders (dot grid) ------- */
+    .grid-wrap{margin:36px calc( (var(--container) - 100vw)/4 ) 8px}
+    .fig-row{
+      display:grid; grid-template-columns: 1fr 2fr; gap:24px;
+    }
+    @media (max-width:900px){ .fig-row{grid-template-columns:1fr;}}
+    figure{
+      margin:0; border:none; border-radius:var(--radius);
+      background-image: none;
+      min-height:240px; position:relative;
+    }
+    figcaption{
+      position:absolute; top:8px; left:10px; right:10px;
+      font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color:var(--muted); background:rgba(246,243,234,0.85);
+      padding:4px 6px; border:1px solid var(--line); border-radius:6px; width:max-content;
+    }
+    .fig-body{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      color:#8b877c; font-size:14px; padding:16px; text-align:center;
+    }
+
+    /* ------- Content blocks ------- */
+    section{padding:36px 0; border-top:1px solid var(--line)}
+    h2{
+      font-size: clamp(20px, 3.2vw, 28px);
+      margin:0 0 10px 0; letter-spacing:.2px;
+    }
+    p{margin:0 0 16px 0; color:var(--muted)}
+    .two-col{display:grid; grid-template-columns: 2fr 1fr; gap:28px}
+    @media (max-width:900px){ .two-col{grid-template-columns:1fr}}
+
+    /* ------- List cards (results/faq) ------- */
+    .cards{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px}
+    @media (max-width:900px){ .cards{grid-template-columns:1fr}}
+    .card{
+      border:1px solid var(--line); border-radius:var(--radius); background:#faf7ef;
+      padding:14px 14px 16px;
+    }
+    .media-slot{
+      border:1px dashed var(--line); border-radius:8px; min-height:160px;
+      background-image: radial-gradient(#d0cbc0 1px, transparent 1px);
+      background-size:18px 18px; display:flex; align-items:center; justify-content:center;
+      color:#8b877c; font-size:14px; text-align:center; margin-bottom:10px;
+    }
+    /* === Image centering & sizing helpers === */
+    .center-img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    /* Fit modes (use when image sits inside a fixed-size slot) */
+    .img-contain { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .img-cover  { width: 100%; height: 100%; object-fit: cover;  display: block; }
+
+    /* Optional wrappers for consistent box sizes */
+    .ar-16-9 { aspect-ratio: 16/9; }
+    .ar-4-3  { aspect-ratio: 4/3;  }
+    .h-180 { min-height: 180px; } .h-240 { min-height: 240px; }
+    .h-320 { min-height: 320px; } .h-420 { min-height: 420px; }
+
+    /* Width utilities */
+    .w-320 { width: 320px; } .w-480 { width: 480px; } .w-720 { width: 720px; }
+    .maxw-600 { max-width: 600px; } .maxw-800 { max-width: 800px; } .maxw-1000 { max-width: 1000px; }
+    .pdf-embed { width: 100%; height: 100%; border: 0; }
+
+    /* Let <figure> auto-size to its image if you use it */
+    .auto-height { min-height: 0; }
+    p.section-text {
+      color: #000;
+      font-weight: 400 !important;
+      font-style: normal;
+      font-size: clamp(18px, 1.8vw, 22px);
+      line-height: 1.7;
+    }
+    p.section-text strong,
+    p.section-text b,
+    p.section-text .bold {
+      font-weight: 700;
+    }
+
+    /* ------- Code block & footer ------- */
+    pre{
+      background:#fff; border:1px solid var(--line); border-radius:8px;
+      padding:14px; overflow:auto; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    footer{border-top:1px solid var(--line); padding:28px 0 48px; color:var(--muted)}
+    .foot{display:grid; grid-template-columns:2fr 1fr 1fr; gap:18px}
+    @media (max-width:900px){ .foot{grid-template-columns:1fr} }
+    ul.clean{list-style:none; padding-left:0; margin:.5em 0 0 0}
+    ul.clean li{margin:6px 0}
+
+    /* === Video carousel (3-up, slide-by-one) === */
+    .video-carousel {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px 44px; /* room for arrows */
+    }
+    .video-carousel .viewport { overflow: hidden; }
+    .video-carousel .track {
+      display: flex;
+      gap: 10px;
+      transform: translateX(0);
+      will-change: transform;
+    }
+    .video-carousel .slide {
+      flex: 0 0 calc((100% - 20px) / 3); /* 3 items with 10px gaps */
+    }
+    .video-carousel .frame {
+      position: relative;
+      aspect-ratio: 4/3;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background-image: none;
+    }
+    .video-carousel video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain; /* ensure no cropping */
+      background: #000;
+    }
+    .video-carousel .nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--ink);
+      background: #fff8;
+      backdrop-filter: blur(2px);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .video-carousel .nav:hover { background: #fff; }
+    .video-carousel .nav:active { transform: translateY(-50%) scale(0.98); }
+    .video-carousel .nav[disabled] { opacity: .4; cursor: default; }
+    .video-carousel .nav.prev { left: 10px; }
+    .video-carousel .nav.next { right: 10px; }
+    .video-carousel .nav svg {
+      width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 2;
+    }
+    @media (max-width: 880px) {
+      .video-carousel .slide { flex-basis: calc((100% - 10px) / 2); }
+    }
+    @media (max-width: 560px) {
+      .video-carousel .slide { flex-basis: 100%; }
+    }
+
+    /* Popup styles for hover interaction (graphics interactivity preserved) */
+    .popup {
+      display: none;
+      position: absolute;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+
+      /* Desktop size (unchanged behavior) */
+      width: 300px;
+      min-width: 300px;
+      max-width: 300px;
+    }
+
+    @media (max-width: 900px) {
+      .popup {
+        /* Smaller mobile popup + same horizontal size for all images */
+        width: 220px;                 /* change to 200/210/230 if you want */
+        min-width: 220px;
+        max-width: min(220px, calc(100vw - 24px)); /* clamp only on very narrow screens */
+      }
+    }
+
+    .popup img {
+      width: 100%;
+      height: auto;
+
+      /* fallback + modern dynamic viewport unit */
+      max-height: calc(100vh - 24px);
+      max-height: calc(100dvh - 24px);
+
+      object-fit: contain;
+      display: block;
+      border-radius: 10px;
+    }
+
+    #results1 figure,
+    #online-adaptation figure,
+    #results2 figure {
+      background: transparent;
+    }
+    #results1 figure::before,
+    #online-adaptation figure::before,
+    #results2 figure::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      bottom: 0;
+      left: -100px;
+      right: -100px;
+      background-image: url('background_grid.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      border-radius: var(--radius);
+    }
+
+    /* ===== Section: Strong explotation, signs of exploration (2 columns) ===== */
+    #exploration-section .columns{
+      display:grid; grid-template-columns: 1fr 1fr; gap:18px; align-items:start; margin-top: 12px;
+    }
+    #exploration-section .col{
+      border:1px solid var(--line); border-radius: var(--radius); background:#fff; padding:12px;
+    }
+    #exploration-section .col h3{
+      margin:4px 0 10px 0; font-size: 18px; color:#2F3677; letter-spacing:.2px;
+    }
+    #exploration-section .stack{
+      display:grid; gap:10px;
+    }
+    #exploration-section .vid{
+      border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#000;
+      aspect-ratio: 16/9;
+    }
+    #exploration-section .vid video{ width:100%; height:100%; display:block; object-fit: contain; background:#000; }
+    /* NEW: description under each video */
+    #exploration-section .vid-desc{
+      margin: 6px 2px 12px;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    @media (max-width: 900px){
+      #exploration-section .columns{ grid-template-columns: 1fr; }
+    }
+
+    /* ===== Mobile-only image containment (desktop unchanged) ===== */
+    @media (max-width: 900px){
+      .container { padding: 0 16px; }
+
+      .grid-wrap{
+        margin: 20px 0 8px !important;
+      }
+
+      #results1 figure::before,
+      #online-adaptation figure::before,
+      #results2 figure::before{
+        left: 0;
+        right: 0;
+        background-size: contain;
+      }
+
+      #results0 img,
+      #online-adaptation img,
+      #results1 img,
+      #results2 img,
+      .center-img{
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .w-320, .w-480, .w-720{
+        width: 100% !important;
+        max-width: 100%;
+      }
+    }
+
+  </style>
+  <!-- MathJax (LaTeX rendering) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],   // inline: \( ... \)
+        displayMath: [['\\[', '\\]']],  // block:  \[ ... \]
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="head">
+      <div class="brand"><a href="https://dunnolab.ai" aria-label="Home"><img src="hat.png" alt="Dunnolab logo"></a></div>
+      <nav class="nav" aria-label="primary">
+        <a href="https://dunnolab.ai/b-1">Blog</a>
+        <a href="https://dunnolab.ai/p">Papers</a>
+        <a href="https://dunnolab.ai/form">Subscribe</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero (updated) -->
+  <main id="home" class="container" style="padding-top:86px;">
+    <section class="hero">
+      <video class="hero-video" autoplay loop muted playsinline>
+        <source src="./videos/initial_video.mp4" type="video/mp4">
+      </video>
+      <div class="hero-content">
+        <h1>Vintix II: Decision Pre-Trained Transformer is a Scalable In-Context Reinforcement Learner</h1>
+        <div class="hero-actions">
+          <a class="pill" href="https://arxiv.org/abs/2501.19400" target="_blank" rel="noreferrer">Paper</a>
+          <a class="pill" href="https://github.com/dunnolab/vintix-II" target="_blank" rel="noreferrer">Github</a>
+          <a class="pill" href="https://huggingface.co/dunnolab/Vintix" target="_blank" rel="noreferrer">Huggingface</a>
+          <a class="pill" href="https://artfawl-vintix2.hf.space/" target="_blank" rel="noreferrer">Try Demo</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="video-carousel" aria-label="video carousel">
+      <button class="nav prev" aria-label="Previous video">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+
+      <div class="viewport">
+        <div class="track" id="videoTrack">
+          <!-- Slides will be injected by JS -->
+        </div>
+      </div>
+
+      <button class="nav next" aria-label="Next video">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <section>
+      <h2>One model, many domains: in-context adaptation for continuous control via flow-based action sampling</h2>
+      <p class="section-text">In-context learning (ICL) has made prompt-based adaptation feel routine for large language models: a short prompt can change a model’s behavior without any parameter updates. Bringing this capability to RL promises agents that can adapt to new environments and pursue reward without task-specific fine-tuning. This in-context RL (ICRL) paradigm opens up a clear path to building large action models that can adapt from context to a wide range of unseen dynamics.</p>
+      <p class="section-text">Most ICRL methods have been evaluated on small-scale benchmarks, while using them to train large, multi-domain action models has received comparatively limited attention. Our work targets this setting by training a single model that operates across diverse domains, adapts to unseen dynamics, and provides tooling to support further research in this direction.</p>
+      <p class="section-text">Our approach scales Decision-Pretrained Transformers (DPT) into a single cross-domain action model trained on a wide range of continuous-control problems: robotic locomotion and manipulation, HVAC control, PDE optimization, autonomous driving, and more. Prior DPT variantions for continuous actions typically rely on Gaussian heads, which often under-represent multi-modality and can introduce a mismatch with complex action posteriors. To address this, we combine in-context conditioning with a rectified-flow objective, enabling one model to represent richer action distributions and sample actions directly at inference time. To scale training, we collect a diverse dataset covering 209 training tasks across 10 domains, plus 46 additional held-out tasks reserved for evaluation.</p>
+    </section>
+
+    <!-- Results 0 -->
+    <section id="results0">
+      <h2>Domain-level performance</h2>
+      <div class="grid-wrap">
+          <figure>
+             <img id="polar-graph" src="polar.jpg" alt="the alt text" class="center-img maxw-1000" usemap="#polar-map" data-map-base-width="1000" data-map-base-height="400">
+          </figure>
+      </div>
+      <map name="polar-map">
+        <area shape="circle" coords="250,120,10" alt="Point 1" onmouseover="showPopup(1, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="175,140,10" alt="Point 2" onmouseover="showPopup(2, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="150,200,10" alt="Point 3" onmouseover="showPopup(3, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="140,275,10" alt="Point 4" onmouseover="showPopup(4, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="220,285,10" alt="Point 5" onmouseover="showPopup(5, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="250,300,10" alt="Point 6" onmouseover="showPopup(6, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="280,280,10" alt="Point 7" onmouseover="showPopup(7, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="310,320,10" alt="Point 8" onmouseover="showPopup(8, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="260,240,10" alt="Point 9" onmouseover="showPopup(9, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="295,250,10" alt="Point 10" onmouseover="showPopup(10, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="370,205,10" alt="Point 11" onmouseover="showPopup(11, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="325,140,10" alt="Point 12" onmouseover="showPopup(12, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="735,120,10" alt="Point 13" onmouseover="showPopup(13, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="660,140,10" alt="Point 14" onmouseover="showPopup(14, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="615,200,10" alt="Point 15" onmouseover="showPopup(15, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="620,275,10" alt="Point 16" onmouseover="showPopup(16, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="685,305,10" alt="Point 17" onmouseover="showPopup(17, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="735,365,10" alt="Point 18" onmouseover="showPopup(18, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="805,340,15" alt="Point 19" onmouseover="showPopup(19, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="855,280,10" alt="Point 20" onmouseover="showPopup(20, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="855,200,10" alt="Point 21" onmouseover="showPopup(21, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="810,135,10" alt="Point 22" onmouseover="showPopup(22, event)" onmouseout="hidePopup()">
+      </map>
+      <p class="section-text">
+        We evaluated our model on 209 training tasks and 46 unseen tasks in Online and Offline format. Online inference uses FIFO-style memory filling, effectively implementing a sliding attention window over past interaction history, while offline inference is performed with a fixed set of demonstrator episodes serving as the task-specific context. 
+      </p>
+      <p class="section-text">
+        On the training split, Vintix II is close to optimal on most domains under both protocols and performs slightly better in the offline. On unseen tasks, Vintix II achieves more than 67% of demonstrator performance across all domains in the offline setting and preserves this level of performance in the online scenario for all domains except Meta-World and Bi-DexHands. However, the Meta-World ML45 and Bi-DexHands ML20 splits are particularly challenging and likely require additional information to solve, which explains the performance drop. These results suggest that the model learns fully parametric in-context imitation in the offline setting and exhibits deployment-time adaptive behavior in the online setting.
+      </p>
+    </section>
+
+    <!-- New Section: Online adaptation to unseen dynamics -->
+    <section id="online-adaptation">
+      <h2>Online adaptation to unseen dynamics</h2>
+      <div class="grid-wrap">
+          <figure class="auto-height">
+             <img id="test-online-graph" src="test_online.png" alt="the alt text" class="center-img maxw-1000" usemap="#test-online-map" data-map-base-width="1000" data-map-base-height="400">
+          </figure>
+      </div>
+      <map name="test-online-map">
+        <area shape="circle" coords="90,50,20" alt="Point 23" onmouseover="showPopup(23, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="90,260,20" alt="Point 24" onmouseover="showPopup(24, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="90,340,20" alt="Point 25" onmouseover="showPopup(25, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="310,30,20" alt="Point 26" onmouseover="showPopup(26, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="310,220,20" alt="Point 27" onmouseover="showPopup(27, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="310,295,20" alt="Point 28" onmouseover="showPopup(28, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="530,50,20" alt="Point 29" onmouseover="showPopup(29, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="530,200,20" alt="Point 30" onmouseover="showPopup(30, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="530,290,20" alt="Point 31" onmouseover="showPopup(31, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="750,30,20" alt="Point 32" onmouseover="showPopup(32, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="750,150,20" alt="Point 33" onmouseover="showPopup(33, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="750,280,20" alt="Point 34" onmouseover="showPopup(34, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="980,30,20" alt="Point 35" onmouseover="showPopup(35, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="980,110,20" alt="Point 36" onmouseover="showPopup(36, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="980,270,20" alt="Point 37" onmouseover="showPopup(37, event)" onmouseout="hidePopup()">
+      </map>
+      <p class="section-text">Normalized returns per episode during online inference indicate that our model can iteratively adapt to unseen tasks, even when no prior context is provided. In the Meta-World and SinerGym domains, performance improves over several episodes, suggesting that multiple interactions are needed to infer task-specific dynamics. In contrast, in MetaDrive the model achieves near-optimal performance after a single episode, and additional experience mainly stabilizes performance under unseen dynamics. Overall, these results suggest that the model leverages training experience to perform strongly on new tasks while also extracting information from inference-time interactions to further improve its policy.</p>
+    </section>
+
+    <!-- Results 1 -->
+    <section id="results1">
+      <h2>Effect of Number of Demonstrations</h2>
+      <div class="grid-wrap">
+          <figure class="auto-height">
+             <img id="offline-demos-graph" src="offline_demos.png" alt="the alt text" class="center-img maxw-1000" usemap="#offline-demos-map" data-map-base-width="1000" data-map-base-height="300">
+          </figure>
+      </div>
+      <map name="offline-demos-map">
+        <area shape="circle" coords="60,115,10" alt="Point 38" onmouseover="showPopup(38, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="100,125,10" alt="Point 39" onmouseover="showPopup(39, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="155,50,10" alt="Point 40" onmouseover="showPopup(40, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="180,55,10" alt="Point 41" onmouseover="showPopup(41, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="265,90,10" alt="Point 42" onmouseover="showPopup(42, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="305,90,10" alt="Point 43" onmouseover="showPopup(43, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="355,80,10" alt="Point 44" onmouseover="showPopup(44, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="385,80,10" alt="Point 45" onmouseover="showPopup(45, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="465,82,8" alt="Point 46" onmouseover="showPopup(46, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="483,82,8" alt="Point 47" onmouseover="showPopup(47, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="510,68,8" alt="Point 48" onmouseover="showPopup(48, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="530,64,8" alt="Point 49" onmouseover="showPopup(49, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="550,68,8" onmouseover="showPopup(50, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="575,70,5" alt="Point 51" onmouseover="showPopup(51, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="590,75,5" alt="Point 52" onmouseover="showPopup(52, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="670,100,10" alt="Point 53" onmouseover="showPopup(53, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="710,90,10" alt="Point 54" onmouseover="showPopup(54, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="760,90,10" alt="Point 55" onmouseover="showPopup(55, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="790,95,10" alt="Point 56" onmouseover="showPopup(56, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="870,110,10" alt="Point 57" onmouseover="showPopup(57, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="910,100,10" alt="Point 58" onmouseover="showPopup(58, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="970,105,10" alt="Point 59" onmouseover="showPopup(59, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="995,105,10" alt="Point 60" onmouseover="showPopup(60, event)" onmouseout="hidePopup()">
+
+        <!-- Second row -->
+        <area shape="circle" coords="60,260,10" alt="Point 61" onmouseover="showPopup(61, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="100,260,10" alt="Point 62" onmouseover="showPopup(62, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="155,260,10" alt="Point 63" onmouseover="showPopup(63, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="180,250,10" alt="Point 64" onmouseover="showPopup(64, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="265,235,10" alt="Point 65" onmouseover="showPopup(65, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="305,240,10" alt="Point 66" onmouseover="showPopup(66, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="355,235,10" alt="Point 67" onmouseover="showPopup(67, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="385,240,10" alt="Point 68" onmouseover="showPopup(68, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="465,285,10" alt="Point 69" onmouseover="showPopup(69, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="505,275,10" alt="Point 70" onmouseover="showPopup(70, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="560,270,10" alt="Point 71" onmouseover="showPopup(71, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="590,240,10" alt="Point 72" onmouseover="showPopup(72, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="670,250,10" alt="Point 73" onmouseover="showPopup(73, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="710,250,10" alt="Point 74" onmouseover="showPopup(74, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="760,250,10" alt="Point 75" onmouseover="showPopup(75, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="790,250,10" alt="Point 76" onmouseover="showPopup(76, event)" onmouseout="hidePopup()">
+
+        <area shape="circle" coords="870,245,10" alt="Point 77" onmouseover="showPopup(77, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="910,245,10" alt="Point 78" onmouseover="showPopup(78, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="970,245,10" alt="Point 79" onmouseover="showPopup(79, event)" onmouseout="hidePopup()">
+        <area shape="circle" coords="995,245,10" alt="Point 80" onmouseover="showPopup(80, event)" onmouseout="hidePopup()">
+      </map>
+      <p class="section-text">
+          To assess how the number of demonstrations in the prompt affects performance on unseen tasks, we evaluated Vintix II with demonstrator actions included in the context, varying the context length from 500 to 4000 \( (o_q,a,r) \ tuples. Performance improves with prompt size for Meta-World, Industrial-Benchmark, and SinerGym, while remaining stable across all other domains. These results suggest that augmenting the context with additional data improves model performance, or at least does not degrade it when only a few demonstrations are sufficient for successful task completion.      </p>
+    </section>
+
+    <!-- Results 2 -->
+    <section id="results2">
+      <h2>Progressive Concentration of Action Beliefs</h2>
+      <div class="grid-wrap">
+          <figure class="auto-height">
+             <img src="tsvd_actions_main.png" alt="the alt text" class="center-img maxw-1000">
+          </figure>
+      </div>
+      <p class="section-text">
+        Further insight is obtained by examining how the model’s action distribution changes with context length. We fix an observation and sample 100 actions from the model for different context lengths to estimate the induced action distribution. The resulting kernel density estimates (KDEs) consistently exhibit posterior-like contraction: short contexts produce broad, high-variance distributions, indicating substantial uncertainty, whereas longer contexts yield progressively sharper and more concentrated modes.. These patterns suggest that Vintix II exhibits in-context posterior-sampling-like behavior, aligning with the theoretical characterization of DPT in the original work.
+      </p>
+    </section>
+
+    <!-- ===== New Section: Strong explotation, signs of exploration (LAST, before BibTeX) ===== -->
+    <section id="exploration-section">
+      <h2>Strong explotation, signs of exploration</h2>
+      <p class="section-text">
+        Despite the high results and ability of the adaptation on unseen dynamics, our model still suffers from adaptation to completely new dynamics.
+        This problem is partially solved by adding expert demonstration into context, but it still is not the enough.
+      </p>
+
+      <div class="columns">
+        <!-- Successful -->
+        <div class="col" aria-labelledby="success-title">
+          <h3 id="success-title">Successful adaptation</h3>
+          <div class="stack">
+            <div class="vid ar-16-9">
+              <video preload="metadata" muted playsinline autoplay loop>
+                <source src="videos/mw_videos/door-unlock-v2.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="vid-desc">Turn the toggle switch clockwise</p>
+
+            <div class="vid ar-16-9">
+              <video preload="metadata" muted playsinline autoplay loop>
+                <source src="videos/kinetix/l-hard-lunar-lander-v1.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="vid-desc">The ship’s green part must contact the blue panel and avoid the red stripe</p>
+
+            <div class="vid ar-16-9">
+              <video preload="metadata" muted playsinline autoplay loop>
+                <source src="videos/metadrive/cones_C_69.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="vid-desc">The car must reach the end of the road without an accident</p>
+          </div>
+        </div>
+
+        <!-- Failed -->
+        <div class="col" aria-labelledby="failed-title">
+          <h3 id="failed-title">Failed adaptation</h3>
+          <div class="stack">
+            <div class="vid ar-16-9">
+              <video preload="metadata" muted playsinline autoplay loop>
+                <source src="videos/mw_videos/bin-picking-v2.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="vid-desc">Put the green cube to the blue box</p>
+
+            <div class="vid ar-16-9">
+              <video preload="metadata" muted playsinline autoplay loop>
+                <source src="videos/kinetix/l-hard-pinball-v1.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="vid-desc">Green ball must reach the blue ball</p>
+
+            <div class="vid ar-16-9">
+              <video preload="metadata" muted playsinline autoplay loop>
+                <source src="videos/metadrive/cones_C_69_bad.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="vid-desc">The car must reach the end of the road without an accident</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cite -->
+    <section id="cite">
+      <h2>BibTeX</h2>
+      <pre><code> @misc{polubarov2025vintixactionmodelincontext,
+      title={Vintix: Action Model via In-Context Reinforcement Learning}, 
+      author={Andrey Polubarov and Nikita Lyubaykin and Alexander Derevyagin and Ilya Zisman and Denis Tarasov and Alexander Nikulin and Vladislav Kurenkov},
+      year={2025},
+      eprint={2501.19400},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2501.19400}, 
+} </code></pre>
+      <div style="text-align:right; margin-top:8px">
+        <a class="pill" href="#" target="_blank">Copy</a>
+      </div>
+    </section>
+
+    <section id="demo-videos"></section>
+  </main>
+
+  <!-- Popup container (placed at the end of body for z-index) -->
+  <div id="popup" class="popup"></div>
+
+  <script>
+    // Always open from top on reload/back-forward restore
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // If URL has #anchor from previous session, clear it
+    if (location.hash) {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+
+    // Jump to top immediately (no smooth yet)
+    window.scrollTo(0, 0);
+    // Enable smooth scrolling only after first paint/load
+    window.addEventListener('load', () => {
+      window.scrollTo(0, 0);
+      document.documentElement.classList.add('smooth-scroll');
+    }, { once: true });
+
+    // Try Demo button: smooth scroll without putting #demo-videos in URL
+    document.getElementById('try-demo-btn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('demo-videos')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+    /* ====== Simple 3-up video carousel, slide-by-one ====== */
+    const VIDEO_SOURCES = [
+      { src: 'videos/mw_videos/door-unlock-v2.mp4', type: 'video/mp4' },
+      { src: 'videos/metadrive/cones_C_69.mp4', type: 'video/mp4' },
+      { src: 'videos/humenv/GOAL~zombie-2.mp4', type: 'video/mp4' },
+      { src: 'videos/kinetix/l-grasp-easy-v1.mp4', type: 'video/mp4' },
+      { src: 'videos/kinetix/l-mjc-half-cheetah-v1.mp4', type: 'video/mp4' },
+      { src: 'videos/mw_videos/pick-out-of-hole-v2.mp4', type: 'video/mp4' },
+      { src: 'videos/mw_videos/window-open-v2.mp4', type: 'video/mp4' },
+    ];
+
+    const VISIBLE = 3;
+    let firstIndex = 0;
+    let nextIndex = (firstIndex + VISIBLE) % VIDEO_SOURCES.length;
+
+    const track = document.getElementById('videoTrack');
+    const btnPrev = document.querySelector('.video-carousel .nav.prev');
+    const btnNext = document.querySelector('.video-carousel .nav.next');
+
+    function createSlide(item) {
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+
+      const video = document.createElement('video');
+      video.controls = false;
+      video.preload = 'metadata';
+      video.muted = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.playsInline = true;
+
+      const source = document.createElement('source');
+      source.src = item.src;
+      source.type = item.type || 'video/mp4';
+      video.appendChild(source);
+
+      /* reveal controls when user clicks */
+      video.addEventListener('click', () => {
+        document.querySelectorAll('.video-carousel video, #exploration-section video').forEach(v => {
+          if (v !== video) v.controls = false;
+        });
+        video.controls = true;
+      });
+
+      frame.appendChild(video);
+      slide.appendChild(frame);
+      return slide;
+    }
+
+    function measureStep() {
+      const firstSlide = track.querySelector('.slide');
+      return firstSlide ? firstSlide.getBoundingClientRect().width + 10 : 0;
+    }
+
+    function initCarousel() {
+      if (!VIDEO_SOURCES.length) return;
+      track.innerHTML = '';
+      for (let i = 0; i < Math.min(VISIBLE, VIDEO_SOURCES.length); i++) {
+        const idx = (firstIndex + i) % VIDEO_SOURCES.length;
+        track.appendChild(createSlide(VIDEO_SOURCES[idx]));
+      }
+      nextIndex = (firstIndex + VISIBLE) % VIDEO_SOURCES.length;
+    }
+    initCarousel();
+
+    function slideRight() {
+      if (VIDEO_SOURCES.length <= VISIBLE) return;
+
+      const step = measureStep();
+      track.appendChild(createSlide(VIDEO_SOURCES[nextIndex]));
+
+      requestAnimationFrame(() => {
+        track.style.transition = 'transform 400ms ease';
+        track.style.transform = `translateX(-${step}px)`;
+      });
+
+      const onEnd = () => {
+        const firstSlide = track.querySelector('.slide');
+        const video = firstSlide && firstSlide.querySelector('video');
+        if (video) { try { video.pause(); } catch (_) {} }
+        firstSlide?.remove();
+
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0)';
+
+        firstIndex = (firstIndex + 1) % VIDEO_SOURCES.length;
+        nextIndex  = (nextIndex + 1) % VIDEO_SOURCES.length;
+
+        track.removeEventListener('transitionend', onEnd);
+      };
+      track.addEventListener('transitionend', onEnd, { once: true });
+    }
+
+    function slideLeft() {
+      if (VIDEO_SOURCES.length <= VISIBLE) return;
+
+      const step = measureStep();
+      const prevIndex = (firstIndex - 1 + VIDEO_SOURCES.length) % VIDEO_SOURCES.length;
+      track.insertBefore(createSlide(VIDEO_SOURCES[prevIndex]), track.firstChild);
+
+      track.style.transition = 'none';
+      track.style.transform = `translateX(-${step}px)`;
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          track.style.transition = 'transform 400ms ease';
+          track.style.transform = 'translateX(0)';
+        });
+      });
+
+      const onEnd = () => {
+        const slides = track.querySelectorAll('.slide');
+        const last = slides[slides.length - 1];
+        const video = last && last.querySelector('video');
+        if (video) { try { video.pause(); } catch (_) {} }
+        last?.remove();
+
+        firstIndex = prevIndex;
+        nextIndex  = (firstIndex + VISIBLE) % VIDEO_SOURCES.length;
+
+        track.style.transition = 'none';
+        track.removeEventListener('transitionend', onEnd);
+      };
+      track.addEventListener('transitionend', onEnd, { once: true });
+    }
+
+    btnNext.addEventListener('click', slideRight);
+    btnPrev.addEventListener('click', slideLeft);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') slideRight();
+      if (e.key === 'ArrowLeft')  slideLeft();
+    });
+
+    /* ====== Make static section videos autoplay+loop, controls on click ====== */
+    function initSectionVideos() {
+      const vids = document.querySelectorAll('#exploration-section video');
+      vids.forEach(video => {
+        // enforce attributes in case of browser quirks
+        video.muted = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.controls = false;
+
+        // reveal controls on user click, hide on others
+        video.addEventListener('click', () => {
+          document.querySelectorAll('.video-carousel video, #exploration-section video').forEach(v => {
+            if (v !== video) v.controls = false;
+          });
+          video.controls = true;
+        });
+      });
+    }
+    initSectionVideos();
+
+    /* ====== Graphics interactivity: hover popups ====== */
+    function showPopup(areaId, event) {
+      // On touch devices, ignore ghost hover events that can appear after pinch/tap
+      const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+      if (isTouch && event && event.type === 'mouseover') return;
+
+      const popup = document.getElementById('popup');
+      let imageSrc = '';
+      if (areaId === 1)  imageSrc = 'polar_additionals/controlgym_test.jpg';
+      if (areaId === 2)  imageSrc = 'polar_additionals/metadrive_test.jpg';
+      if (areaId === 3)  imageSrc = 'polar_additionals/city_learn_test.jpg';
+      if (areaId === 4)  imageSrc = 'polar_additionals/sinergym_test.jpg';
+      if (areaId === 5)  imageSrc = 'polar_additionals/humenv_test.jpg';
+      if (areaId === 6)  imageSrc = 'polar_additionals/kinetix_test.jpg';
+      if (areaId === 7)  imageSrc = 'polar_additionals/metaworld_test.jpg';
+      if (areaId === 8)  imageSrc = 'polar_additionals/metaworld_test.jpg';
+      if (areaId === 9)  imageSrc = 'polar_additionals/bidex_test.jpg';
+      if (areaId === 10) imageSrc = 'polar_additionals/bidex_test.jpg';
+      if (areaId === 11) imageSrc = 'polar_additionals/ib_test.jpg';
+      if (areaId === 12) imageSrc = 'polar_additionals/mujoco_test.jpg';
+      if (areaId === 13) imageSrc = 'polar_additionals/controlgym_train.jpg';
+      if (areaId === 14) imageSrc = 'polar_additionals/metadrive_train.jpg';
+      if (areaId === 15) imageSrc = 'polar_additionals/city_learn_train.jpg';
+      if (areaId === 16) imageSrc = 'polar_additionals/sinergym_train.jpg';
+      if (areaId === 17) imageSrc = 'polar_additionals/humenv_train.jpg';
+      if (areaId === 18) imageSrc = 'polar_additionals/kinetix_train.jpg';
+      if (areaId === 19) imageSrc = 'polar_additionals/metaworld_train.jpg';
+      if (areaId === 20) imageSrc = 'polar_additionals/bidex_train.jpg';
+      if (areaId === 21) imageSrc = 'polar_additionals/ib_train.jpg';
+      if (areaId === 22) imageSrc = 'polar_additionals/mujoco_train.jpg';
+
+      if (areaId === 23) imageSrc = 'test_online_additionals/metadrive_validation_1.png';
+      if (areaId === 24) imageSrc = 'test_online_additionals/sinergym_validation_1.png';
+      if (areaId === 25) imageSrc = 'test_online_additionals/metaworld_validation_1.png';
+      if (areaId === 26) imageSrc = 'test_online_additionals/metadrive_validation_2.png';
+      if (areaId === 27) imageSrc = 'test_online_additionals/sinergym_validation_2.png';
+      if (areaId === 28) imageSrc = 'test_online_additionals/metaworld_validation_2.png';
+      if (areaId === 29) imageSrc = 'test_online_additionals/metadrive_validation_3.png';
+      if (areaId === 30) imageSrc = 'test_online_additionals/sinergym_validation_3.png';
+      if (areaId === 31) imageSrc = 'test_online_additionals/metaworld_validation_3.png';
+      if (areaId === 32) imageSrc = 'test_online_additionals/metadrive_validation_4.png';
+      if (areaId === 33) imageSrc = 'test_online_additionals/sinergym_validation_4.png';
+
+      if (areaId === 34) imageSrc = 'test_online_additionals/metaworld_validation_4.png';
+      if (areaId === 35) imageSrc = 'test_online_additionals/metadrive_validation_5.png';
+      if (areaId === 36) imageSrc = 'test_online_additionals/sinergym_validation_5.png';
+      if (areaId === 37) imageSrc = 'test_online_additionals/metaworld_validation_5.png';
+
+      if (areaId === 38) imageSrc = 'offline_demos_additionals/Meta-World_05.jpg';
+      if (areaId === 39) imageSrc = 'offline_demos_additionals/Meta-World_1.jpg';
+      if (areaId === 40) imageSrc = 'offline_demos_additionals/Meta-World_25.jpg';
+      if (areaId === 41) imageSrc = 'offline_demos_additionals/Meta-World_4.jpg';
+
+      if (areaId === 42) imageSrc = 'offline_demos_additionals/Industrial__Benchmark_05.jpg';
+      if (areaId === 43) imageSrc = 'offline_demos_additionals/Industrial__Benchmark_1.jpg';
+      if (areaId === 44) imageSrc = 'offline_demos_additionals/Industrial__Benchmark_25.jpg';
+      if (areaId === 45) imageSrc = 'offline_demos_additionals/Industrial__Benchmark_4.jpg';
+
+      if (areaId === 46) imageSrc = 'offline_demos_additionals/Bi-DexHands_01.jpg';
+      if (areaId === 47) imageSrc = 'offline_demos_additionals/Bi-DexHands_01.jpg';
+      if (areaId === 48) imageSrc = 'offline_demos_additionals/Bi-DexHands_02.jpg';
+      if (areaId === 49) imageSrc = 'offline_demos_additionals/Bi-DexHands_05.jpg';
+      if (areaId === 50) imageSrc = 'offline_demos_additionals/Bi-DexHands_02.jpg';
+      if (areaId === 51) imageSrc = 'offline_demos_additionals/Bi-DexHands_25.jpg';
+      if (areaId === 52) imageSrc = 'offline_demos_additionals/Bi-DexHands_4.jpg';
+
+      if (areaId === 53) imageSrc = 'offline_demos_additionals/MuJoCo_05.jpg';
+      if (areaId === 54) imageSrc = 'offline_demos_additionals/MuJoCo_1.jpg';
+      if (areaId === 55) imageSrc = 'offline_demos_additionals/MuJoCo_25.jpg';
+      if (areaId === 56) imageSrc = 'offline_demos_additionals/MuJoCo_4.jpg';
+
+      if (areaId === 57) imageSrc = 'offline_demos_additionals/Kinetix_05.jpg';
+      if (areaId === 58) imageSrc = 'offline_demos_additionals/Kinetix_1.jpg';
+      if (areaId === 59) imageSrc = 'offline_demos_additionals/Kinetix_25.jpg';
+      if (areaId === 60) imageSrc = 'offline_demos_additionals/Kinetix_4.jpg';
+
+      if (areaId === 61) imageSrc = 'offline_demos_additionals/HumEnv_05.jpg';
+      if (areaId === 62) imageSrc = 'offline_demos_additionals/HumEnv_1.jpg';
+      if (areaId === 63) imageSrc = 'offline_demos_additionals/HumEnv_25.jpg';
+      if (areaId === 64) imageSrc = 'offline_demos_additionals/HumEnv_4.jpg';
+
+      if (areaId === 65) imageSrc = 'offline_demos_additionals/MetaDrive_05.jpg';
+      if (areaId === 66) imageSrc = 'offline_demos_additionals/MetaDrive_1.jpg';
+      if (areaId === 67) imageSrc = 'offline_demos_additionals/MetaDrive_25.jpg';
+      if (areaId === 68) imageSrc = 'offline_demos_additionals/MetaDrive_4.jpg';
+
+      if (areaId === 69) imageSrc = 'offline_demos_additionals/SinerGym_05.jpg';
+      if (areaId === 70) imageSrc = 'offline_demos_additionals/SinerGym_1.jpg';
+      if (areaId === 71) imageSrc = 'offline_demos_additionals/SinerGym_25.jpg';
+      if (areaId === 72) imageSrc = 'offline_demos_additionals/SinerGym_4.jpg';
+
+      if (areaId === 73) imageSrc = 'offline_demos_additionals/ControlGym_05.jpg';
+      if (areaId === 74) imageSrc = 'offline_demos_additionals/ControlGym_1.jpg';
+      if (areaId === 75) imageSrc = 'offline_demos_additionals/ControlGym_25.jpg';
+      if (areaId === 76) imageSrc = 'offline_demos_additionals/ControlGym_4.jpg';
+
+      if (areaId === 77) imageSrc = 'offline_demos_additionals/CityLearn_05.jpg';
+      if (areaId === 78) imageSrc = 'offline_demos_additionals/CityLearn_1.jpg';
+      if (areaId === 79) imageSrc = 'offline_demos_additionals/CityLearn_25.jpg';
+      if (areaId === 80) imageSrc = 'offline_demos_additionals/CityLearn_4.jpg';
+
+      popup.innerHTML = `<img src="${imageSrc}" alt="Additional info">`;
+      popup.style.display = 'block';
+      popup.style.visibility = 'hidden';
+      setPopupWidthForZoom(popup);
+      setPopupMaxHeightForZoom(popup);
+
+      const placePopup = () => {
+        const gap = 12;
+        const pad = 8;
+
+        const vp = getViewportBox();
+
+        // MISSING vars (this was breaking popups)
+        const pw = popup.offsetWidth;
+        const ph = popup.offsetHeight;
+
+        const clientX = (typeof event.clientX === 'number')
+          ? event.clientX
+          : (typeof event.pageX === 'number' ? (event.pageX - vp.left) : vp.width / 2);
+
+        const clientY = (typeof event.clientY === 'number')
+          ? event.clientY
+          : (typeof event.pageY === 'number' ? (event.pageY - vp.top) : vp.height / 2);
+
+        const anchorX = vp.left + clientX;
+        const anchorY = vp.top + clientY;
+
+        let left = (clientX < vp.width / 2)
+          ? (anchorX + gap)
+          : (anchorX - pw - gap);
+
+        let top = anchorY + gap;
+        if (top + ph > vp.top + vp.height - pad) {
+          top = anchorY - ph - gap;
+        }
+
+        const minLeft = vp.left + pad;
+        const maxLeft = vp.left + vp.width - pw - pad;
+        const minTop = vp.top + pad;
+        const maxTop = vp.top + vp.height - ph - pad;
+
+        left = Math.max(minLeft, Math.min(left, maxLeft));
+        top  = Math.max(minTop,  Math.min(top,  maxTop));
+
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+        popup.style.visibility = 'visible';
+
+        // extra safety after zoom/pan changes
+        clampPopupInViewport(popup);
+      };
+
+
+      // Reposition after image actually loads (important for correct size)
+      const imgEl = popup.querySelector('img');
+      if (imgEl && !imgEl.complete) {
+        imgEl.addEventListener('load', placePopup, { once: true });
+      } else {
+        placePopup();
+      }
+
+    }
+
+    function hidePopup() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'none';
+      popup.innerHTML = '';
+    }
+
+    function getViewportBox() {
+      const vv = window.visualViewport;
+      if (vv) {
+        const left = (typeof vv.pageLeft === 'number')
+          ? vv.pageLeft
+          : (window.scrollX + vv.offsetLeft);
+
+        const top = (typeof vv.pageTop === 'number')
+          ? vv.pageTop
+          : (window.scrollY + vv.offsetTop);
+
+        return {
+          left,
+          top,
+          width: vv.width,
+          height: vv.height,
+          scale: vv.scale || 1
+        };
+      }
+      return {
+        left: window.scrollX,
+        top: window.scrollY,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        scale: 1
+      };
+    }
+
+
+    function setPopupWidthForZoom(popup) {
+      const isMobile = window.matchMedia('(max-width: 900px)').matches;
+      const base = isMobile ? 220 : 300;
+      const vp = getViewportBox();
+
+      // Zoom-aware width: smaller when zoomed in
+      let w = isMobile ? (base / vp.scale) : base;
+
+      // Hard fit into visible viewport
+      const maxW = Math.max(80, vp.width - 16);      // never overflow
+      const minW = Math.min(140, maxW);              // minimum, but never > maxW
+
+      w = Math.min(w, maxW);
+      w = Math.max(w, minW);
+
+      const px = `${Math.round(w)}px`;
+      popup.style.width = px;
+      popup.style.minWidth = px;
+      popup.style.maxWidth = px;
+    }
+
+    function setPopupMaxHeightForZoom(popup) {
+      const vp = getViewportBox();
+      const img = popup.querySelector('img');
+      if (!img) return;
+
+      // keep inside visible viewport even during pinch zoom
+      img.style.maxHeight = `${Math.max(120, Math.floor(vp.height - 24))}px`;
+    }
+
+
+    function clampPopupInViewport(popup) {
+      const vp = getViewportBox();
+      const pad = 8;
+      const pw = popup.offsetWidth;
+      const ph = popup.offsetHeight;
+
+      let left = parseFloat(popup.style.left);
+      let top  = parseFloat(popup.style.top);
+
+      if (Number.isNaN(left)) left = vp.left + pad;
+      if (Number.isNaN(top))  top  = vp.top + pad;
+
+      const minLeft = vp.left + pad;
+      const maxLeft = vp.left + vp.width - pw - pad;
+      const minTop  = vp.top + pad;
+      const maxTop  = vp.top + vp.height - ph - pad;
+
+      // If popup is wider/taller than viewport, pin to padded edge
+      if (maxLeft < minLeft) left = minLeft;
+      else left = Math.max(minLeft, Math.min(left, maxLeft));
+
+      if (maxTop < minTop) top = minTop;
+      else top = Math.max(minTop, Math.min(top, maxTop));
+
+      popup.style.left = `${left}px`;
+      popup.style.top  = `${top}px`;
+    }
+
+
+    /* ====== Responsive image-map coords + mobile tap support (fixed) ====== */
+    function getAreaIdFromInline(area) {
+      const raw = area.getAttribute('onmouseover') || '';
+      const m = raw.match(/showPopup\((\d+)\s*,/);
+      return m ? Number(m[1]) : null;
+    }
+
+    function pointFromEvent(e) {
+      let clientX = 0, clientY = 0;
+
+      if (e.changedTouches && e.changedTouches[0]) {
+        clientX = e.changedTouches[0].clientX;
+        clientY = e.changedTouches[0].clientY;
+      } else if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX ?? 0;
+        clientY = e.clientY ?? 0;
+      }
+
+      const vp = getViewportBox();
+      return {
+        clientX,
+        clientY,
+        pageX: vp.left + clientX,
+        pageY: vp.top + clientY,
+        type: e.type
+      };
+    }
+
+    function getMapBaseSize(img, map) {
+      // 1) explicit override if provided on <img> or <map>
+      const explicitW = Number(img.dataset.mapBaseWidth || map.dataset.baseWidth || 0);
+      const explicitH = Number(img.dataset.mapBaseHeight || map.dataset.baseHeight || 0);
+      if (explicitW > 0 && explicitH > 0) return { w: explicitW, h: explicitH };
+
+      // 2) derive authored coordinate bounds from <area coords> (preferred)
+      let maxX = 0, maxY = 0;
+
+      map.querySelectorAll('area').forEach(area => {
+        const coords = (area.dataset.baseCoords || area.coords)
+          .split(',')
+          .map(v => Number(v.trim()));
+        const shape = (area.shape || '').toLowerCase();
+
+        if (shape === 'circle' && coords.length >= 3) {
+          const [x, y, r] = coords;
+          maxX = Math.max(maxX, x + r);
+          maxY = Math.max(maxY, y + r);
+        } else if (shape === 'rect' && coords.length >= 4) {
+          maxX = Math.max(maxX, coords[2]);
+          maxY = Math.max(maxY, coords[3]);
+        } else {
+          for (let i = 0; i < coords.length; i += 2) {
+            maxX = Math.max(maxX, coords[i] || 0);
+            maxY = Math.max(maxY, coords[i + 1] || 0);
+          }
+        }
+      });
+
+      if (maxX > 0 && maxY > 0) {
+        // tiny pad to avoid edge clipping/rounding drift
+        return { w: Math.ceil(maxX + 1), h: Math.ceil(maxY + 1) };
+      }
+
+      // 3) fallback only if map has no usable coords
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        return { w: img.naturalWidth, h: img.naturalHeight };
+      }
+
+      return { w: 1, h: 1 };
+    }
+
+
+    function applyResponsiveMapCoords() {
+      const isDesktop = window.matchMedia('(min-width: 901px)').matches;
+
+      document.querySelectorAll('img[usemap]').forEach(img => {
+        const mapRef = img.getAttribute('usemap');
+        if (!mapRef) return;
+
+        const mapName = mapRef.replace('#', '');
+        const map = document.querySelector(`map[name="${mapName}"]`);
+        if (!map) return;
+
+        const baseW = Number(img.dataset.mapBaseWidth || 0);
+        const baseH = Number(img.dataset.mapBaseHeight || 0);
+        if (!baseW || !baseH) return;
+
+        // Save authored coords exactly once from HTML attrs
+        map.querySelectorAll('area').forEach(area => {
+          if (!area.dataset.baseCoords) {
+            area.dataset.baseCoords = area.getAttribute('coords') || '';
+          }
+        });
+
+        // Desktop must stay exactly as authored
+        if (isDesktop) {
+          map.querySelectorAll('area').forEach(area => {
+            if (area.dataset.baseCoords) area.setAttribute('coords', area.dataset.baseCoords);
+          });
+          return;
+        }
+
+        // Mobile: scale to rendered image size
+        const rect = img.getBoundingClientRect();
+        const renderedW = rect.width;
+        if (!renderedW) return;
+
+        // Use isotropic scaling to avoid vertical drift
+        const s = renderedW / baseW;
+
+        // Optional per-image vertical correction in "authored" px (can be negative)
+        const yShift = Number(img.dataset.mapYShift || 0);
+
+        map.querySelectorAll('area').forEach(area => {
+          const raw = area.dataset.baseCoords;
+          if (!raw) return;
+          const c = raw.split(',').map(v => Number(v.trim()));
+          const shape = (area.shape || '').toLowerCase();
+          let out;
+
+          if (shape === 'circle' && c.length === 3) {
+            out = [
+              Math.round(c[0] * s),
+              Math.round((c[1] + yShift) * s),
+              Math.max(8, Math.round(c[2] * s))
+            ];
+          } else {
+            // x coords: even indices, y coords: odd indices
+            out = c.map((v, i) => Math.round(((i % 2 === 0) ? v : (v + yShift)) * s));
+          }
+
+          area.setAttribute('coords', out.join(','));
+        });
+      });
+    }
+
+
+
+    let __ignoreGlobalHideUntil = 0;
+
+    function bindMapTapHandlers() {
+      document.querySelectorAll('map area').forEach(area => {
+        // Important for iOS: make <area> definitely interactive on tap
+        if (!area.hasAttribute('href') || area.getAttribute('href') === '#') {
+          area.setAttribute('href', 'javascript:void(0)');
+        }
+
+        if (area.dataset.tapBound === '1') return;
+        area.dataset.tapBound = '1';
+
+        const id = getAreaIdFromInline(area);
+        if (!id) return;
+
+        const openFromEvent = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          __ignoreGlobalHideUntil = Date.now() + 300;
+          showPopup(id, pointFromEvent(e));
+        };
+
+        // Mobile
+        area.addEventListener('touchend', (e) => {
+          area.dataset.lastTouchTs = String(Date.now());
+          openFromEvent(e);
+        }, { passive: false, capture: true });
+        // Desktop click fallback (hover still works via inline onmouseover)
+        area.addEventListener('click', (e) => {
+          const lastTouchTs = Number(area.dataset.lastTouchTs || 0);
+          if (Date.now() - lastTouchTs < 700) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          openFromEvent(e);
+        }, true);
+      });
+    }
+
+    function initMaps() {
+      bindMapTapHandlers();
+      applyResponsiveMapCoords();
+    }
+
+    window.addEventListener('load', initMaps);
+    document.querySelectorAll('img[usemap]').forEach(img => {
+      img.addEventListener('load', applyResponsiveMapCoords);
+    });
+
+    let __mapResizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(__mapResizeTimer);
+      __mapResizeTimer = setTimeout(applyResponsiveMapCoords, 80);
+    });
+    window.addEventListener('orientationchange', applyResponsiveMapCoords);
+
+    let __popupViewportRAF = 0;
+    function onViewportZoomOrResize() {
+      if (__popupViewportRAF) return;
+      __popupViewportRAF = requestAnimationFrame(() => {
+        __popupViewportRAF = 0;
+        const popup = document.getElementById('popup');
+        if (popup.style.display !== 'block') return;
+        setPopupWidthForZoom(popup);
+        setPopupMaxHeightForZoom(popup);
+        clampPopupInViewport(popup);
+      });
+    }
+    window.addEventListener('scroll', onViewportZoomOrResize, { passive: true });
+    window.addEventListener('touchmove', onViewportZoomOrResize, { passive: true });
+
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', onViewportZoomOrResize);
+      window.visualViewport.addEventListener('scroll', onViewportZoomOrResize);
+    }
+    window.addEventListener('resize', onViewportZoomOrResize);
+
+
+    // close popup when tapping/clicking outside (but not immediately after opening)
+    document.addEventListener('click', (e) => {
+      if (Date.now() < __ignoreGlobalHideUntil) return;
+      if (!e.target.closest('#popup')) hidePopup();
+    });
+    document.addEventListener('touchstart', (e) => {
+      if (Date.now() < __ignoreGlobalHideUntil) return;
+      if (!e.target.closest('#popup')) hidePopup();
+    }, { passive: true });
+
+  </script>
+</body>
+</html>
