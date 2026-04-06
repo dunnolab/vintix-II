@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vintix II</title>
   <meta name="description" content="Vintix II is a new multi-domain action model capable of in-context adaptation ">
+  <link rel="icon" type="image/png" href="./hat.png">
   <link rel="preload" href="./fonts/GentiumPlus-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <style>
     @font-face {
@@ -638,7 +639,7 @@
         <area shape="circle" coords="995,245,10" alt="Point 80" onmouseover="showPopup(80, event)" onmouseout="hidePopup()">
       </map>
       <p class="section-text">
-          To assess how the number of demonstrations in the prompt affects performance on unseen tasks, we evaluated Vintix II with demonstrator actions included in the context, varying the context length from 500 to 4000 \( (o_q,a,r) \ tuples. Performance improves with prompt size for Meta-World, Industrial-Benchmark, and SinerGym, while remaining stable across all other domains. These results suggest that augmenting the context with additional data improves model performance, or at least does not degrade it when only a few demonstrations are sufficient for successful task completion.      </p>
+          To assess how the number of demonstrations in the prompt affects performance on unseen tasks, we evaluated Vintix II with demonstrator actions included in the context, varying the context length from 500 to 4000 \( (o_q,a,r) \) tuples. Performance improves with prompt size for Meta-World, Industrial-Benchmark, and SinerGym, while remaining stable across all other domains. These results suggest that augmenting the context with additional data improves model performance, or at least does not degrade it when only a few demonstrations are sufficient for successful task completion.      </p>
     </section>
 
     <!-- Results 2 -->
@@ -650,13 +651,13 @@
           </figure>
       </div>
       <p class="section-text">
-        Further insight is obtained by examining how the model’s action distribution changes with context length. We fix an observation and sample 100 actions from the model for different context lengths to estimate the induced action distribution. The resulting kernel density estimates (KDEs) consistently exhibit posterior-like contraction: short contexts produce broad, high-variance distributions, indicating substantial uncertainty, whereas longer contexts yield progressively sharper and more concentrated modes.. These patterns suggest that Vintix II exhibits in-context posterior-sampling-like behavior, aligning with the theoretical characterization of DPT in the original work.
+        Further insight is obtained by examining how the model’s action distribution changes with context length. We fix an observation and sample 100 actions from the model for different context lengths to estimate the induced action distribution. The resulting kernel density estimates (KDEs) consistently exhibit posterior-like contraction: short contexts produce broad, high-variance distributions, indicating substantial uncertainty, whereas longer contexts yield progressively sharper and more concentrated modes. These patterns suggest that Vintix II exhibits in-context posterior-sampling-like behavior, aligning with the theoretical characterization of DPT in the original work.
       </p>
     </section>
 
-    <!-- ===== New Section: Strong explotation, signs of exploration (LAST, before BibTeX) ===== -->
+    <!-- ===== New Section: Strong exploitation, signs of exploration (LAST, before BibTeX) ===== -->
     <section id="exploration-section">
-      <h2>Strong explotation, signs of exploration</h2>
+      <h2>Strong exploitation, signs of exploration</h2>
       <p class="section-text">
         Despite the high results and ability of the adaptation on unseen dynamics, our model still suffers from adaptation to completely new dynamics.
         This problem is partially solved by adding expert demonstration into context, but it still is not the enough.
