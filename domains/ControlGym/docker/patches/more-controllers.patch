@@ -1,0 +1,501 @@
+From 22fca489a863cff395b6deeba55fe9da1c3def68 Mon Sep 17 00:00:00 2001
+From: Alexander Serkov <32331578+setday@users.noreply.github.com>
+Date: Fri, 29 Aug 2025 12:50:05 +0300
+Subject: [PATCH] More controllers
+
+---
+ controlgym/controllers/__init__.py |   4 +-
+ controlgym/controllers/chaotic.py  |  62 +++++
+ controlgym/controllers/wspo.py     | 397 +++++++++++++++++++++++++++++
+ 3 files changed, 462 insertions(+), 1 deletion(-)
+ create mode 100644 controlgym/controllers/chaotic.py
+ create mode 100644 controlgym/controllers/wspo.py
+
+diff --git a/controlgym/controllers/__init__.py b/controlgym/controllers/__init__.py
+index 9fa828a..1a77e48 100644
+--- a/controlgym/controllers/__init__.py
++++ b/controlgym/controllers/__init__.py
+@@ -2,4 +2,6 @@ from controlgym.controllers.lqr import LQR
+ from controlgym.controllers.h2hinf import H2Hinf
+ from controlgym.controllers.lqg import LQG
+ from controlgym.controllers.ppo import PPO
+-from controlgym.controllers.zero import Zero
+\ No newline at end of file
++from controlgym.controllers.zero import Zero
++from controlgym.controllers.chaotic import Chaotic
++from controlgym.controllers.wspo import WSPO
+\ No newline at end of file
+diff --git a/controlgym/controllers/chaotic.py b/controlgym/controllers/chaotic.py
+new file mode 100644
+index 0000000..99b3ff6
+--- /dev/null
++++ b/controlgym/controllers/chaotic.py
+@@ -0,0 +1,62 @@
++import numpy as np
++
++class Chaotic:
++    """
++    ### Description
++
++    This environment implements the chaotic (random) controller.
++
++    ### Arguments
++    For env_id in the following list:
++    ["toy", "ac1", "ac2", "ac3", "ac4", "ac5", "ac6", "ac7", "ac8", "ac9", "ac10",
++    "bdt1", "bdt2", "cbm", "cdp", "cm1", "cm2", "cm3", "cm4", "cm5", "dis1", "dis2",
++    "dlr", "he1", "he2", "he3", "he4", "he5", "he6", "iss", "je1", "je2", "lah",
++    "pas", "psm", "rea", "umv", "allen_cahn", "burgers", "cahn_hilliard",
++    "convection_diffusion_reaction", "fisher", "ginzburg_landau",
++    "korteweg_de_vries", "kuramoto_sivashinsky", "schrodinger", "wave"]
++
++    ```
++    env = controlgym.make(env_id, **kwargs)
++    controlgym.controllers.Chaotic(env)
++    ```
++
++    Argument:
++        None.
++    """
++    def __init__(self, env):
++        self.env = env
++
++    def select_action(self):
++        """Returns the chaotic control input."""
++        return self.env.action_space.sample()
++
++    def run(self, state=None, seed=None):
++        """Run a trajectory of the environment using chaotic control,
++            calculate the H2 cost, and save the state trajectory to env.state_traj.
++            The trajectory is terminated when the environment returns a done signal (most likely
++            due to the exceedance of the maximum number of steps: env.n_steps)
++        Args:
++            state: (optional ndarray[float]), an user-defined initial state.
++            seed: (optional int), random seed for the environment.
++
++        Returns:
++            total_reward: float, the accumulated reward of the trajectory,
++                which is equal to the negative H2 cost.
++        """
++        # reset the environment
++        _, info = self.env.reset(seed=seed, state=state)
++        # run the simulated trajectory and calculate the h2 cost
++        total_reward = 0
++        state_traj = np.zeros((self.env.n_state, self.env.n_steps+1))
++        state_traj[:, 0] = info['state']
++        for t in range(self.env.n_steps):
++            action = self.select_action()
++            observation, reward, terminated, truncated, info = self.env.step(action)
++
++            state_traj[:, t+1] = info["state"]
++            if terminated or truncated:
++                break
++            total_reward += reward
++
++        self.env.state_traj = state_traj
++        return total_reward
+diff --git a/controlgym/controllers/wspo.py b/controlgym/controllers/wspo.py
+new file mode 100644
+index 0000000..e0999d0
+--- /dev/null
++++ b/controlgym/controllers/wspo.py
+@@ -0,0 +1,397 @@
++import os
++import logging
++from typing import Optional
++
++import numpy as np
++import numpy.typing as npt
++from numpy.linalg import inv
++from scipy.linalg import solve_discrete_are, LinAlgError
++
++import torch
++
++from tqdm import tqdm
++
++
++def _compute_ABU(trajectory_z: np.ndarray, trajectory_a: np.ndarray, p: int = 8):
++    """Compute the A, B, and U matrices from the trajectory data using DMDc
++
++    Args:
++        trajectory_z: ndarray[float], state trajectory of shape (n_state, n_steps).
++        trajectory_a: ndarray[float], action trajectory of shape (n_action, n_steps - 1).
++    Returns:
++        A: ndarray[float], system matrix of shape (n_state, n_state).
++        B: ndarray[float], input matrix of shape (n_state, n_action).
++        U: ndarray[float], control input matrix of shape (n_action, n_steps - 1).
++    """
++
++    nz = trajectory_z.shape[0]  # number of states
++    ns = trajectory_z.shape[1] - 1  # number of time steps
++
++    Z = trajectory_z[:, :-1]  # shape: (n_state, n_steps - 1)
++    Z_next = trajectory_z[:, 1:]  # shape: (n_state, n_steps - 1)
++    Upsilon = trajectory_a  # shape: (n_action, n_steps - 1)
++
++    Omega = np.vstack([Z, Upsilon])  # shape: (n_state + n_action, n_steps - 1)
++
++    # Find the p-truncated SVD of Omega
++    Phi, Xi, Lambda = np.linalg.svd(Omega, full_matrices=False)
++
++    Phi = Phi[:, :p]  # shape: (n_state + n_action, p)
++    Xi = Xi[:p]  # shape: (p,)
++    Lambda = Lambda[:p, :]  # shape: (p, n_steps - 1)
++
++    # Compute the ns-truncated SVD of Z'
++    U, _, _ = np.linalg.svd(Z_next)
++
++    U = U[:, :ns]  # shape: (n_state, n_steps - 1)
++
++    # Compute the A, B matrices
++    tmp = ((U.T @ Z_next @ Lambda.T) / Xi) @ Phi.T  # shape: (n_state, n_state + n_action)
++    A = tmp[:, :nz] @ U
++    B = tmp[:, nz:]
++
++    return A, B, U
++
++def _lqr_gain(A: npt.NDArray[np.float64], B: npt.NDArray[np.float64], Q: npt.NDArray[np.float64],
++              R: npt.NDArray[np.float64], S: npt.NDArray[np.float64]):
++    """Private function to compute the gain matrices of the LQR controller
++        using algebraic Riccati equation (ARE).
++
++    Args:
++        A, B, Q, R, S: ndarray[float], system matrices.
++
++    Returns:
++        gain_lqr: ndarray[float], control gain matrix for regulation.
++        gain_lqt: ndarray[float], additional control gain matrix for tracking.
++        If the ARE fails to find a solution, gain is set to None.
++    """
++    try:
++        P = solve_discrete_are(A, B, Q, R, e=None, s=S)
++    except LinAlgError:
++        # handle the exceptional case where solve_discrete_are fails
++        logging.warning("solve_discrete_are failed to find a finite solution")
++        gain_lqr = gain_lqt = None
++    else:
++        T1 = R + B.T @ P @ B
++        try:
++            T1inv = inv(T1)
++        except LinAlgError:
++            logging.warning("using pseudo-inverse matrix for T1 (R + B.T @ P @ B)")
++            T1inv = np.linalg.pinv(T1)  # use pseudo-inverse if T1 is singular
++
++        gain_lqr = -T1inv @ (B.T @ P @ A + S.T)
++
++        T2 = np.identity(A.shape[0]) - (A + B @ gain_lqr).T
++        try:
++            T2inv = inv(T2)
++        except LinAlgError:
++            logging.warning("using pseudo-inverse matrix for T2 (np.identity(A.shape[0]) - (A + B @ gain_lqr).T)")
++            T2inv = np.linalg.pinv(T2)  # use pseudo-inverse if T2 is singular
++
++        # compute the LQ tracking gain for PDE envs, where S = 0.
++        gain_lqt = T1inv @ B.T @ T2inv @ Q
++    return gain_lqr, gain_lqt
++
++
++class WSPO:
++    """
++    Warm-Start Policy Optimization (Zhang et al., 2024) for PDE control.
++    This controller initializes with the LQR (tracking) gain from a reduced model
++    and then fine-tunes it via zeroth-order policy gradient updates.
++
++    For PDE tasks like Burgers', Allen-Cahn, and KdV (with constant target state),
++    the controller uses:
++        action = K @ state + K_t @ target_state
++
++    The gain matrices K, K_t are refined by sampling random perturbations,
++    running two rollouts, and performing a finite-difference policy gradient update:contentReference[oaicite:11]{index=11}.
++
++    ```
++    env = controlgym.make(env_id, **kwargs)
++    controlgym.controllers.WSPO(env)
++    ```
++
++    Argument:
++        env: controlgym PDE environment with attributes A, B2, Q, R, S, and target_state.
++        lr: float, learning rate.
++    """
++
++    def __init__(self, env):
++        self.env = env
++
++        self.KaMB = torch.zeros((self.env.n_action, self.env.n_state), dtype=getattr(self.env, "dtype", torch.float64))
++        self.KbMB = torch.zeros((self.env.n_action, self.env.n_state), dtype=getattr(self.env, "dtype", torch.float64))
++        self.U = torch.eye(self.env.n_state, dtype=getattr(self.env, "dtype", torch.float64), device=self.env.device)
++
++    def warmup(self, max_warmup_steps=4, warmup_seed: int = 42, truncation_value: int = 8,
++               action_mean: float = 0.0, action_std: float = 0.1, R_coeff: float = 1.0,
++               Q_coeff: float = 1.0):
++        # Initialize gains KaMB, KbMB
++        # If env has linear dynamics (A, B2, Q, R), solve LQT for warm start
++
++        if hasattr(self.env, 'A') and hasattr(self.env, 'B2'):
++            A, B, self.U = self.env.A, self.env.B2, np.identity(self.env.n_state)
++        else:
++            zero_trajectory_z, zero_trajectory_a, total_reward = self._collect_zero_trajectory(
++                seed=warmup_seed,
++                max_steps=max_warmup_steps,
++                action_mean=action_mean,
++                action_std=action_std
++            )
++            A, B, self.U = _compute_ABU(zero_trajectory_z, zero_trajectory_a, p=truncation_value)
++
++            print(f"Warmup: collected zero-trajectory with total reward {total_reward:.2f} ")
++
++        Q = self.env.Q if hasattr(self.env, "Q") else np.identity(self.env.n_state) * Q_coeff
++        R = self.env.R if hasattr(self.env, "R") else np.identity(self.env.n_action) * R_coeff
++        S = self.env.S if hasattr(self.env, "S") else np.zeros_like(B)
++
++        Q = self.U.T @ np.array(Q) @ self.U  # Transform Q to state space
++
++        # compute the LQR gain
++        KaMB, KbMB = _lqr_gain(A, B, Q, R, S)
++        self.KaMB, self.KbMB = torch.tensor(KaMB, dtype=getattr(self.env, "dtype", torch.float64)), torch.tensor(KbMB, dtype=getattr(self.env, "dtype", torch.float64))
++
++        self.U: torch.Tensor = torch.tensor(self.U, dtype=getattr(self.env, "dtype", torch.float64))
++
++    def _collect_zero_trajectory(self, seed: int | None, max_steps: int | None, action_mean: float, action_std: float):
++        """Collect a zero-trajectory for the environment to compute A, B matrices."""
++        if seed is not None:
++            np.random.seed(seed)
++
++        # Reset the environment
++        _, info = self.env.reset(seed=seed)
++        trajectory_z = np.zeros((self.env.n_state, self.env.n_steps + 1), dtype=np.float64)
++        trajectory_a = np.zeros((self.env.n_action, self.env.n_steps), dtype=np.float64)
++
++        if max_steps is None:
++            max_steps = self.env.n_steps
++
++        total_reward = 0.0
++
++        for t in range(max_steps):
++            action = torch.normal(action_mean, action_std, (self.env.n_action,), device=self.env.device, dtype=torch.float64)
++            _, reward, _, _, info = self.env.step(action.cpu().numpy())
++            trajectory_z[:, t + 1] = info["state"]
++            trajectory_a[:, t] = action
++            total_reward += reward
++
++        return trajectory_z, trajectory_a, total_reward
++
++    def _select_action_by_state(self, state: torch.Tensor, target_state: Optional[torch.Tensor] = None) -> torch.Tensor:
++        """Compute control input using current gains and target state."""
++        print(getattr(target_state, "dtype"), getattr(state, "dtype"))
++        if target_state is not None:
++            return self.KaMB @ (self.U.T @ state) + self.KbMB @ (self.U.T @ target_state)
++        else:
++            return self.KaMB @ (self.U.T @ state)
++
++    def select_action(self, observation: np.ndarray) -> np.ndarray:
++        """Compute control input using current gains."""
++        return self._select_action_by_state(
++            getattr(self.env, "state"),
++            getattr(self.env, "target_state")
++        ).detach().cpu().numpy()
++
++    def train(
++            self,
++            radius: float = 0.1,
++            lr: float = 1e-4,
++            discount_factor: float = 0.99,
++            num_train_iter: int = 1000,
++        ) -> list[dict]:
++        """
++        Fine-tune the controller via zeroth-order policy gradient.
++
++        Args:
++            radius: float, perturbation radius for finite-difference gradient.
++            lr: float, learning rate for gradient ascent.
++            discount_factor: float, learning rate decay factor.
++            num_train_iter: int, number of training iterations.
++        """
++
++        device = self.env.device if hasattr(self.env, 'device') else 'cpu'
++        self.KaMB = self.KaMB.to(device)
++        self.KbMB = self.KbMB.to(device)
++
++        self.prev_best_reward = -np.inf  # Initialize best reward for early stopping
++        self.prev_best_KaMB = self.KaMB.clone()
++        self.prev_best_KbMB = self.KbMB.clone()
++
++
++        # Concatenate KaMB and KbMB for easier perturbation
++        # Theta has shape (m, 2n): [KaMB | KbMB]
++        Theta = torch.cat([self.KaMB, self.KbMB], dim=1)  # shape: (m, 2n)
++
++        ns = self.KaMB.shape[1]  # number of steps
++
++        training_data = []
++
++        progress = tqdm(range(num_train_iter))
++        for it in progress:
++            # Sample random perturbation U of same shape, normalized
++            U = torch.randn_like(Theta, device=device, dtype=torch.float64)
++            U = U / torch.norm(U.flatten(), p=2)  # normalize to unit norm
++
++            # Perturb the gains
++            Theta_plus = Theta + radius * U
++            Theta_minus = Theta - radius * U
++
++            # Split perturbed gains back into K and K_t parts
++            KaMB_plus = Theta_plus[:, :ns]
++            KbMB_plus = Theta_plus[:, ns:]
++            KaMB_minus = Theta_minus[:, :ns]
++            KbMB_minus = Theta_minus[:, ns:]
++
++            # Perform two rollouts with the perturbed policies
++            seed = np.random.randint(0, 2**31 - 1)
++            R_plus = self._rollout_with_gains(seed, KaMB_plus, KbMB_plus)
++            R_minus = self._rollout_with_gains(seed, KaMB_minus, KbMB_minus)
++
++            # Finite-difference gradient estimate (scalar difference times U)
++            step_size = (R_plus - R_minus) * (self.env.n_action * ns) / (radius)
++            # step_size = min(max(step_size, -200.0), 200.0)
++            R_grad = step_size * U
++
++            # Update Theta via gradient ascent on reward
++            Theta += lr * R_grad
++
++            if (R_plus + R_minus) / 2 > self.prev_best_reward:
++                # If the new reward is better, update the best reward and gains
++                self.prev_best_reward = (R_plus + R_minus) / 2
++                self.prev_best_KaMB = self.KaMB.clone()
++                self.prev_best_KbMB = self.KbMB.clone()
++
++            lr *= discount_factor  # decay learning rate
++
++            training_data.append({
++                "iteration": it,
++                "reward_plus": R_plus,
++                "reward_minus": R_minus,
++                "KaMB_norm": torch.norm(self.KaMB, p=2),
++                "KbMB_norm": torch.norm(self.KbMB, p=2),
++                "step_size": step_size,
++                "learning_rate": lr
++            })
++            progress.set_description(
++                f"R_plus: {R_plus:.2f}, R_minus: {R_minus:.2f}, "
++                f"KaMB norm: {torch.norm(self.KaMB, p=2):.2f}, KbMB norm: {torch.norm(self.KbMB, p=2):.2f}, "
++                f"Step size: {step_size:.2f}, LR: {lr:.2e}, "
++                f"Best reward: {self.prev_best_reward:.2f}"
++            )
++
++            # Update stored gains
++            self.KaMB  = Theta[:, :ns]
++            self.KbMB = Theta[:, ns:]
++
++        self.KaMB = self.prev_best_KaMB
++        self.KbMB = self.prev_best_KbMB
++
++        return training_data
++
++    def _rollout_with_gains(self, seed: int, KaMB: torch.Tensor, KbMB: torch.Tensor):
++        """Run one episode with given gains and return total reward.
++
++        Args:
++            seed: int, random seed for reproducibility.
++            KaMB: torch.Tensor, perturbed gain matrix for state feedback.
++            KbMB: torch.Tensor, perturbed gain matrix for target state feedback.
++
++        Returns:
++            total_reward: float, accumulated reward (negative H2 cost).
++        """
++        # Reset environment
++        observation, _ = self.env.reset(seed=seed)
++        total_reward = 0.0
++
++        # Store original gains to restore after rollout
++        KaMB_old, KbMB_old = self.KaMB.clone(), self.KbMB.clone()
++        # Temporarily use perturbed gains
++        self.KaMB, self.KbMB = KaMB, KbMB
++
++        for _ in range(self.env.n_steps):
++            action = self.select_action(observation)
++            observation, reward, terminated, truncated, _ = self.env.step(action)
++            total_reward += reward
++            if terminated or truncated:
++                break
++
++        # Restore original gains
++        self.KaMB, self.KbMB = KaMB_old, KbMB_old
++        return total_reward
++
++    def run(self, state: Optional[npt.NDArray[np.float64]] = None, seed: Optional[int] = None):
++        """Run a trajectory of the environment using the WSPO controller,
++            calculate the H2 cost, and save the state trajectory to env.state_traj.
++            The trajectory is terminated when the environment returns a done signal (most likely
++            due to the exceedance of the maximum number of steps: env.n_steps)
++        Args:
++            state: (optional ndarray[float]), an user-defined initial state.
++            seed: (optional int), random seed for the environment.
++
++        Returns:
++            total_reward: float, the accumulated reward of the trajectory,
++                which is equal to the negative H2 cost.
++        """
++        # reset the environment
++        observation, info = self.env.reset(seed=seed, state=state)
++        # run the simulated trajectory and calculate the h2 cost
++        total_reward = 0
++        state_traj = np.zeros((self.env.n_state, self.env.n_steps + 1))
++        state_traj[:, 0] = info["state"]
++
++        for t in range(self.env.n_steps):
++            action = self.select_action(observation)
++            observation, reward, terminated, truncated, info = self.env.step(action)
++            state_traj[:, t + 1] = info["state"]
++            if terminated or truncated:
++                break
++            total_reward += reward
++
++        self.env.state_traj = state_traj
++        return total_reward
++
++    def save(self, test_dir: str):
++        """Save the WSPO parameters to the test directory.
++        Args:
++            test_dir: str, directory to save the trained parameters.
++
++        Returns:
++            None.
++        """
++        if not os.path.exists(test_dir):
++            os.makedirs(test_dir)
++
++        wspo_params = {
++            "KaMB": self.KaMB,
++            "KbMB": self.KbMB,
++            "U": self.U,
++        }
++        torch.save(wspo_params, os.path.join(test_dir, "wspo_params.pt"))
++
++    def load(self, test_dir: str):
++        """Load the WSPO parameters from the test directory.
++        Args:
++            test_dir: str, directory to load the trained parameters.
++
++        Returns:
++            None.
++        """
++        if not os.path.exists(test_dir):
++            raise FileNotFoundError(f"{test_dir} does not exist")
++
++        wspo_params = torch.load(os.path.join(test_dir, "wspo_params.pt"), weights_only=False)
++        self.KaMB = wspo_params["KaMB"]
++        self.KbMB = wspo_params["KbMB"]
++        self.U = wspo_params.get("U", torch.eye(self.env.n_state))
++
++        if isinstance(self.KaMB, np.ndarray):
++            self.KaMB = torch.tensor(self.KaMB)
++        if isinstance(self.KbMB, np.ndarray):
++            self.KbMB = torch.tensor(self.KbMB)
++        if isinstance(self.U, np.ndarray):
++            self.U = torch.tensor(self.U)
++
++        self.KaMB = self.KaMB.to(dtype=getattr(self.env, "dtype", torch.float64))
++        self.KbMB = self.KbMB.to(dtype=getattr(self.env, "dtype", torch.float64))
++        self.U = self.U.to(dtype=getattr(self.env, "dtype", torch.float64))
+-- 
+2.40.1.windows.1
+

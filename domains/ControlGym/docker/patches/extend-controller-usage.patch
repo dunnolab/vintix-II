@@ -1,0 +1,92 @@
+From 44c95ca1c93845f325f4e78ab7cc015ffd1cef73 Mon Sep 17 00:00:00 2001
+From: Alexander Serkov <32331578+setday@users.noreply.github.com>
+Date: Fri, 29 Aug 2025 12:43:44 +0300
+Subject: [PATCH] Extend contoller usage
+
+---
+ controlgym/controllers/lqg.py | 21 ++++++++++++++++++---
+ controlgym/controllers/lqr.py | 21 ++++++++++++++++++---
+ 2 files changed, 36 insertions(+), 6 deletions(-)
+
+diff --git a/controlgym/controllers/lqg.py b/controlgym/controllers/lqg.py
+index 98bcc53..0efb014 100644
+--- a/controlgym/controllers/lqg.py
++++ b/controlgym/controllers/lqg.py
+@@ -1,6 +1,6 @@
+ import numpy as np
+ import logging
+-from scipy.linalg import solve_discrete_are, solve, inv, LinAlgError
++from scipy.linalg import solve_discrete_are, inv, LinAlgError
+ 
+ 
+ def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float], 
+@@ -23,9 +23,24 @@ def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float],
+         logging.warning("solve_discrete_are failed to find a finite solution")
+         gain_lqr = gain_lqt = None
+     else:
+-        gain_lqr = -solve(R + B.T @ P @ B, B.T @ P @ A + S.T)
++        T1 = R + B.T @ P @ B
++        try:
++            T1inv = inv(T1)
++        except LinAlgError:
++            logging.warning("using pseudo-inverse matrix for T1 (R + B.T @ P @ B)")
++            T1inv = np.linalg.pinv(T1)  # use pseudo-inverse if T1 is singular
++
++        gain_lqr = -T1inv @ (B.T @ P @ A + S.T)
++
++        T2 = np.identity(A.shape[0]) - (A + B @ gain_lqr).T
++        try:
++            T2inv = inv(T2)
++        except LinAlgError:
++            logging.warning("using pseudo-inverse matrix for T2 (np.identity(A.shape[0]) - (A + B @ gain_lqr).T)")
++            T2inv = np.linalg.pinv(T2)  # use pseudo-inverse if T2 is singular
++
+         # compute the LQ tracking gain for PDE envs, where S = 0.
+-        gain_lqt = inv(R + B.T @ P @ B) @ B.T @ inv(np.identity(A.shape[0]) - (A + B @ gain_lqr).T) @ Q
++        gain_lqt = T1inv @ B.T @ T2inv @ Q
+     return gain_lqr, gain_lqt
+ 
+ def _kf_gain(A: np.ndarray[float], C: np.ndarray[float], W: np.ndarray[float], V: np.ndarray[float]):
+diff --git a/controlgym/controllers/lqr.py b/controlgym/controllers/lqr.py
+index 2ed69e6..e91f5d5 100644
+--- a/controlgym/controllers/lqr.py
++++ b/controlgym/controllers/lqr.py
+@@ -1,7 +1,7 @@
+ import numpy as np
+ from numpy.linalg import inv
+ import logging
+-from scipy.linalg import solve_discrete_are, solve, LinAlgError
++from scipy.linalg import solve_discrete_are, LinAlgError
+ 
+ 
+ def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float], 
+@@ -24,9 +24,24 @@ def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float],
+         logging.warning("solve_discrete_are failed to find a finite solution")
+         gain_lqr = gain_lqt = None
+     else:
+-        gain_lqr = -solve(R + B.T @ P @ B, B.T @ P @ A + S.T)
++        T1 = R + B.T @ P @ B
++        try:
++            T1inv = inv(T1)
++        except LinAlgError:
++            logging.warning("using pseudo-inverse matrix for T1 (R + B.T @ P @ B)")
++            T1inv = np.linalg.pinv(T1)  # use pseudo-inverse if T1 is singular
++
++        gain_lqr = -T1inv @ (B.T @ P @ A + S.T)
++
++        T2 = np.identity(A.shape[0]) - (A + B @ gain_lqr).T
++        try:
++            T2inv = inv(T2)
++        except LinAlgError:
++            logging.warning("using pseudo-inverse matrix for T2 (np.identity(A.shape[0]) - (A + B @ gain_lqr).T)")
++            T2inv = np.linalg.pinv(T2)  # use pseudo-inverse if T2 is singular
++
+         # compute the LQ tracking gain for PDE envs, where S = 0.
+-        gain_lqt = inv(R + B.T @ P @ B) @ B.T @ inv(np.identity(A.shape[0]) - (A + B @ gain_lqr).T) @ Q
++        gain_lqt = T1inv @ B.T @ T2inv @ Q
+     return gain_lqr, gain_lqt
+ 
+ 
+-- 
+2.40.1.windows.1
+

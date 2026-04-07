@@ -1,0 +1,116 @@
+diff --git a/metadrive/component/map/base_map.py b/metadrive/component/map/base_map.py
+index f06a0a6d..9a4d7405 100644
+--- a/metadrive/component/map/base_map.py
++++ b/metadrive/component/map/base_map.py
+@@ -23,6 +23,8 @@ class BaseMap(BaseRunnable, ABC):
+ 
+     # define string in json and config
+     SEED = "seed"
++    MAP_SEED = "map_seed"
++
+     LANE_WIDTH = "lane_width"
+     LANE_WIDTH_RAND_RANGE = "lane_width_rand_range"
+     LANE_NUM = "lane_num"
+diff --git a/metadrive/component/map/pg_map.py b/metadrive/component/map/pg_map.py
+index 07324190..17ecff91 100644
+--- a/metadrive/component/map/pg_map.py
++++ b/metadrive/component/map/pg_map.py
+@@ -63,6 +63,7 @@ class PGMap(BaseMap):
+         self.road_network.after_init()
+ 
+     def _big_generate(self, parent_node_path: NodePath, physics_world: PhysicsWorld):
++        map_seed = self._config.get(BaseMap.MAP_SEED, self.engine.global_random_seed)
+         big_map = BIG(
+             self._config.get(self.LANE_NUM, 2),
+             self._config.get(self.LANE_WIDTH, 3.5),
+@@ -71,7 +72,7 @@ class PGMap(BaseMap):
+             physics_world,
+             # self._config["block_type_version"],
+             exit_length=self._config.get("exit_length", 50),
+-            random_seed=self.engine.global_random_seed,
++            random_seed=map_seed,
+             block_dist_config=self.engine.global_config.get("block_dist_config", PGBlockDistConfig)
+         )
+         big_map.generate(self._config[self.GENERATE_TYPE], self._config[self.GENERATE_CONFIG])
+diff --git a/metadrive/envs/base_env.py b/metadrive/envs/base_env.py
+index caafa54d..c5b830d2 100644
+--- a/metadrive/envs/base_env.py
++++ b/metadrive/envs/base_env.py
+@@ -290,7 +290,7 @@ class BaseEnv(gym.Env):
+             config = {}
+         self.logger = get_logger()
+         set_log_level(config.get("log_level", logging.DEBUG if config.get("debug", False) else logging.INFO))
+-        merged_config = self.default_config().update(config, False, ["agent_configs", "sensors"])
++        merged_config = self.default_config().update(config, True, ["agent_configs", "sensors"])
+         global_config = self._post_process_config(merged_config)
+ 
+         self.config = global_config
+diff --git a/metadrive/manager/object_manager.py b/metadrive/manager/object_manager.py
+index d4e89770..d0231d0a 100644
+--- a/metadrive/manager/object_manager.py
++++ b/metadrive/manager/object_manager.py
+@@ -6,7 +6,7 @@ from metadrive.component.road_network import Road
+ from metadrive.component.static_object.traffic_object import TrafficCone, TrafficWarning, TrafficBarrier
+ from metadrive.engine.engine_utils import get_engine
+ from metadrive.manager.base_manager import BaseManager
+-
++import numpy as np
+ 
+ class TrafficObjectManager(BaseManager):
+     """
+@@ -29,6 +29,8 @@ class TrafficObjectManager(BaseManager):
+         super(TrafficObjectManager, self).__init__()
+         self.accident_prob = 0.
+         self.accident_lanes = []
++        object_seed = self.global_config.get("object_manager_seed", self.random_seed)
++        self._object_rng = np.random.RandomState(object_seed)
+ 
+     def before_reset(self):
+         """
+@@ -58,11 +60,11 @@ class TrafficObjectManager(BaseManager):
+             road_1 = Road(block.pre_block_socket.positive_road.end_node, block.road_node(0, 0))
+             road_2 = Road(block.road_node(0, 0), block.road_node(0, 1)) if not isinstance(block, Straight) else None
+ 
+-            if self.np_random.rand() > self.PROHIBIT_SCENE_PROB:
+-                accident_road = self.np_random.choice([road_1, road_2]) if not isinstance(block, Curve) else road_2
++            if self._object_rng.rand() > self.PROHIBIT_SCENE_PROB:
++                accident_road = self._object_rng.choice([road_1, road_2]) if not isinstance(block, Curve) else road_2
+                 accident_road = road_1 if accident_road is None else accident_road
+                 is_ramp = isinstance(block, InRampOnStraight) or isinstance(block, OutRampOnStraight)
+-                on_left = True if self.np_random.rand() > 0.5 or (accident_road is road_2 and is_ramp) else False
++                on_left = True if self._object_rng.rand() > 0.5 or (accident_road is road_2 and is_ramp) else False
+                 accident_lane_idx = 0 if on_left else -1
+                 lane = accident_road.get_lanes(engine.current_map.road_network)[accident_lane_idx]
+                 longitude = lane.length - self.ACCIDENT_AREA_LEN - 5
+@@ -73,19 +75,19 @@ class TrafficObjectManager(BaseManager):
+                 self.accident_lanes.append(accident_road.get_lanes(engine.current_map.road_network)[accident_lane_idx])
+                 self.prohibit_scene(lane, longitude, lateral_len, on_left)
+             else:
+-                accident_road = self.np_random.choice([road_1, road_2])
++                accident_road = self._object_rng.choice([road_1, road_2])
+                 accident_road = road_1 if accident_road is None else accident_road
+                 is_ramp = isinstance(block, InRampOnStraight) or isinstance(block, OutRampOnStraight)
+-                on_left = True if self.np_random.rand() > 0.5 or (accident_road is road_2 and is_ramp) else False
++                on_left = True if self._object_rng.rand() > 0.5 or (accident_road is road_2 and is_ramp) else False
+                 lanes = accident_road.get_lanes(engine.current_map.road_network)
+                 if len(lanes) - 1 == 0:
+                     accident_lane_idx = -1
+                 else:
+-                    accident_lane_idx = self.np_random.randint(0, len(lanes) - 1) if on_left else -1
++                    accident_lane_idx = self._object_rng.randint(0, len(lanes) - 1) if on_left else -1
+                 lane = lanes[accident_lane_idx]
+                 self.accident_lanes.append(accident_road.get_lanes(engine.current_map.road_network)[accident_lane_idx])
+-                longitude = self.np_random.rand() * lane.length / 2 + lane.length / 2
+-                if self.np_random.rand() > 0.5:
++                longitude = self._object_rng.rand() * lane.length / 2 + lane.length / 2
++                if self._object_rng.rand() > 0.5:
+                     self.break_down_scene(lane, longitude)
+                 else:
+                     self.barrier_scene(lane, longitude)
+@@ -170,4 +172,4 @@ class TrafficObjectManager(BaseManager):
+             )
+ 
+             ret[current_name] = name_obj[current_name]
+-        self.spawned_objects = ret
++        self.spawned_objects = ret
+\ No newline at end of file

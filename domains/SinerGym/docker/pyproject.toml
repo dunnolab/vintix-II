@@ -1,0 +1,16 @@
+[project]
+name = "domain"
+description = "Domain Discovery for Vintix II model"
+requires-python =">=3.8"
+dependencies = []
+authors = [
+    {name = "lyubaykin", email = "lyubaykin@airi.net"}
+]
+dynamic = ["version"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["domain"]

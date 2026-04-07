@@ -1,0 +1,190 @@
+# 307 steps
+def_S:
+  path: "DPTDataset/metadrive/def_S"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 9.605147253131786
+  # expert_score: 396.6309421949135
+  expert_score: 426
+# 425
+def_C_69:
+  path: "DPTDataset/metadrive/def_C_69"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 6
+  expert_score: 552.0515210840506
+# 445
+def_C_859:
+  path: "DPTDataset/metadrive/def_C_859"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 7.838602025657361
+  expert_score: 588.1337950538577
+# 462
+def_C_574:
+  path: "DPTDataset/metadrive/def_C_574"
+  group: def_default
+  type: test
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 9.397461485587423
+  expert_score: 611.400795339115
+# 514
+def_C_85:
+  path: "DPTDataset/metadrive/def_C_85"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 9.869081363972379
+  expert_score: 730.452985936769
+# 474
+def_C_785:
+  path: "DPTDataset/metadrive/def_C_785"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 5.681764617391609
+  expert_score: 649.4171353624529
+# 614
+def_C_520:
+  path: "DPTDataset/metadrive/def_C_520"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 7.873797729513822
+  expert_score: 921.5131912521003
+# 621
+def_O_785:
+  path: "DPTDataset/metadrive/def_O_785"
+  group: def_default
+  type: test
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 8.774994820883581
+  expert_score: 589.0133925476762
+# 686
+def_O_291:
+  path: "DPTDataset/metadrive/def_O_291"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 8.380826832786022
+  expert_score: 732.3527468966679
+# 581
+def_O_647:
+  path: "DPTDataset/metadrive/def_O_647"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 8.159402960427093
+  expert_score: 568.8901128529078
+# 743
+def_O_971:
+  path: "DPTDataset/metadrive/def_O_971"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 10.325565435534466
+  expert_score: 770.0340544600368
+# 421
+def_T_971:
+  path: "DPTDataset/metadrive/def_T_971"
+  group: def_default
+  type: test
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 6.72531283283255
+  expert_score: 454.654077064716
+# 416
+def_T_855:
+  path: "DPTDataset/metadrive/def_T_855"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 10.650943567003536
+  expert_score: 485.33605203961525
+#  428
+def_T_98:
+  path: "DPTDataset/metadrive/def_T_98"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 8.961846147596711
+  expert_score: 480.0611794558633
+# 523
+cones_S:
+  path: "DPTDataset/metadrive/cones_S"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 9.933002205060248
+  expert_score: 442.0102731252711
+# 624
+cones_C_69:
+  path: "DPTDataset/metadrive/cones_C_69"
+  group: def_default
+  type: test
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 9.12188115119672
+  expert_score: 534.9567669301937
+# 671
+cones_C_859:
+  path: "DPTDataset/metadrive/cones_C_859"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 8.232691311346967
+  expert_score: 577.4455511842689
+# 718
+cones_C_574:
+  path: "DPTDataset/metadrive/cones_C_574"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 11.444990813960503
+  expert_score: 616.1774514310497
+# 835
+cones_C_85:
+  path: "DPTDataset/metadrive/cones_C_85"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 11.356857797110255
+  expert_score: 719.1928538462645
+# 753
+cones_C_785:
+  path: "DPTDataset/metadrive/cones_C_785"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 10
+  expert_score: 645.8431554005842
+# 943
+cones_C_520:
+  path: "DPTDataset/metadrive/cones_C_520"
+  group: def_default
+  type: default
+  reward_scale: 1
+  episode_sparsity: 2
+  random_score: 10
+  expert_score: 813.4247220747282

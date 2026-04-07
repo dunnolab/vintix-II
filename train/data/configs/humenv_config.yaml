@@ -1,0 +1,150 @@
+"REWARD~move-ego-0-0":
+  path: "DPTDataset/humenv/REWARD~move-ego-0-0"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 12
+  expert_score: 261
+  #std: 22
+  #meta_score: 275 
+"REWARD~move-ego-0-2":
+  path: "DPTDataset/humenv/REWARD~move-ego-0-2"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 10
+  expert_score: 265
+  #std: 13
+  #meta_score: 255
+"REWARD~raisearms-h-h":
+  path: "DPTDataset/humenv/REWARD~raisearms-h-h"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 0.5
+  expert_score: 240
+  #std: 14
+  #meta_score: 265
+"REWARD~crawl-0_5-0-d":
+  path: "DPTDataset/humenv/REWARD~crawl-0_5-0-d"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 10
+  expert_score: 140
+  #std: 7.6
+  #meta_score: 146
+"REWARD~crouch-0":
+  path: "DPTDataset/humenv/REWARD~crouch-0"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 0.2
+  expert_score: 250
+  #std: 7.8
+  #meta_score: 268
+"REWARD~rotate-x--5-0_8":
+  path: "DPTDataset/humenv/REWARD~rotate-x--5-0_8"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 9
+  expert_score: 220
+  #std: 6
+  #meta_score: 222
+"REWARD~rotate-x-5-0_8":
+  path: "DPTDataset/humenv/REWARD~rotate-x-5-0_8"
+  group: basic
+  type: test
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 8
+  expert_score: 211
+  #std: 5
+  #meta_score: 219
+"REWARD~split-0_5":
+  path: "DPTDataset/humenv/REWARD~split-0_5"
+  group: basic
+  type: test
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 9
+  expert_score: 258
+  #std: 8
+  #meta_score: 276
+"REWARD~headstand":
+  path: "DPTDataset/humenv/REWARD~headstand"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 0
+  expert_score: 247
+  #std: 4
+  #meta_score: 251
+"REWARD~move-ego-90-4":
+  path: "DPTDataset/humenv/REWARD~move-ego-90-4"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: 5
+  expert_score: 257
+  #std: 6
+  #meta_score: 247
+"GOAL~t_pose":
+  path: "DPTDataset/humenv/GOAL~t_pose"
+  group: basic
+  type: test
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: -3200
+  expert_score: -605
+  #std: 370
+  #success: 0.99
+"GOAL~crouch_medium":
+  path: "DPTDataset/humenv/GOAL~crouch_medium"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: -3120
+  expert_score: -341
+  #std: 70
+  #success:0.97
+"GOAL~zombie":
+  path: "DPTDataset/humenv/GOAL~zombie"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: -3200
+  expert_score: -410
+  #std: 90
+  #success: 0.95
+"GOAL~lie_front":
+  path: "DPTDataset/humenv/GOAL~lie_front"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: -3200
+  expert_score: -570
+  #std: 90
+  #success: 0.92
+"GOAL~sit_hand_behind":
+  path: "DPTDataset/humenv/GOAL~sit_hand_behind"
+  group: basic
+  type: default
+  reward_scale: 1
+  episode_sparsity: 5
+  random_score: -3200
+  expert_score: -535
+  #std: 15
+  #success: 0.95

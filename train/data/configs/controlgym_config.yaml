@@ -1,0 +1,200 @@
+aircraft_1:
+  path: "DPTDataset/controlgym/aircraft_1"
+  group: linear-3-3-3
+  type: test
+  reward_scale: 0.005
+  episode_sparsity: 5
+  random_score: -6.7e+4 # - starting | real - -1.4e+5
+  expert_score: -0.533097
+aircraft_2:
+  path: "DPTDataset/controlgym/aircraft_2"
+  group: linear-3-3-3
+  type: default
+  reward_scale: 0.005
+  episode_sparsity: 5
+  random_score: -6.7e+4 # - starting | real - -1.3e+5
+  expert_score: -0.927776
+#aircraft_3: # One broken trajectory!
+#  path: "DPTDataset/controlgym/aircraft_3"
+#  group: linear-1-2-2
+#  type: default
+#  reward_scale: 0.002
+#  episode_sparsity: 5
+#  random_score: -1.6e+5 # - starting | real - -9.e+226
+#  expert_score:  -5.54253
+aircraft_4:
+  path: "DPTDataset/controlgym/aircraft_4"
+  group: linear-1-2-4
+  type: default
+  reward_scale: 0.02
+  episode_sparsity: 5
+  random_score: -1.0e+4 # - starting | real - -3.0e+16
+  expert_score: -0.281
+aircraft_5:
+  path: "DPTDataset/controlgym/aircraft_5"
+  group: linear-1-5-10
+  type: default
+  reward_scale: 0.02
+  episode_sparsity: 5
+  random_score: -1.2e+4 # - starting | real - -1.5e+8
+  expert_score: -1.47903
+aircraft_6:
+  path: "DPTDataset/controlgym/aircraft_6"
+  group: linear-4-5-10
+  type: default
+  reward_scale: 0.0005
+  episode_sparsity: 5
+  random_score: -7.2e+5 # - starting | real - -8.e+08
+  expert_score: -113.39
+#aircraft_7:
+#  path: "DPTDataset/controlgym/aircraft_7"
+#  group: linear-2-2-3
+#  type: default
+#  reward_scale: 0.00025
+#  episode_sparsity: 5
+#  random_score: -2.2e+6 # - starting | real - -4.75e+14
+#  expert_score: -15.7824
+#aircraft_8: # Large negative reward
+#  path: "DPTDataset/controlgym/aircraft_8"
+#  group: linear-3-4-3
+#  type: default
+#  reward_scale: 0.2
+#  episode_sparsity: 5
+#  random_score: -4.8e+3 # - starting | real - -4.e+52
+#  expert_score: -264.142
+#aircraft_9: # ic score is too low
+#  path: "DPTDataset/controlgym/aircraft_9"
+#  group: linear-3-4-4
+#  type: default
+#  reward_scale: 1
+#  episode_sparsity: 5
+#  random_score: -9.8e+44 # - starting | real - -6.e+50
+#  expert_score: -148459
+#aircraft_10:
+#  path: "DPTDataset/controlgym/aircraft_10"
+#  group: linear-2-2-3
+#  type: test
+#  reward_scale: 0.00029
+#  episode_sparsity: 5
+#  random_score: -1.82e+6 # - starting | real - -5.e+14
+#  expert_score: -101.878
+cable_1:
+  path: "DPTDataset/controlgym/cable_1"
+  group: linear-1-2-1
+  type: default
+  reward_scale: 0.01
+  episode_sparsity: 5
+  random_score: -4.2e+4 # - starting | real - -3.0e+5
+  expert_score: -23.2848
+cable_2:
+  path: "DPTDataset/controlgym/cable_2"
+  group: linear-1-2-1
+  type: default
+  reward_scale: 0.01
+  episode_sparsity: 5
+  random_score: -4.9e+4 # - starting | real - -3.0e+5
+  expert_score: -20.5709
+cable_3:
+  path: "DPTDataset/controlgym/cable_3"
+  group: linear-1-2-1
+  type: default
+  reward_scale: 0.01
+  episode_sparsity: 5
+  random_score: -5.5e+4 # - starting | real - -3.0e+5
+  expert_score: -15.1609
+cable_4:
+  path: "DPTDataset/controlgym/cable_4"
+  group: linear-1-2-1
+  type: default
+  reward_scale: 0.01
+  episode_sparsity: 5
+  random_score: -5.5e+4 # - starting | real - -3.0e+5
+  expert_score: -12.4534
+cable_5:
+  path: "DPTDataset/controlgym/cable_5"
+  group: linear-1-2-1
+  type: test
+  reward_scale: 0.01
+  episode_sparsity: 5
+  random_score: -5.6e+4 # - starting | real - -2.9e+5
+  expert_score: -9.71268
+pde_convection_diffusion_reaction:
+  path: "DPTDataset/controlgym/pde_convection_diffusion_reaction"
+  group: pde-8-10
+  type: default
+  reward_scale: 0.0077
+  episode_sparsity: 5
+  random_score: -5.8e+4 # - starting | real - -1.6e+06
+  expert_score: -33.3878
+pde_wave:
+  path: "DPTDataset/controlgym/pde_wave"
+  group: pde-8-10
+  type: default
+  reward_scale: 0.001
+  episode_sparsity: 5
+  random_score: -4.5e+5 # - starting | real - -4.5e+07
+  expert_score: -207.279
+pde_schrodinger:
+  path: "DPTDataset/controlgym/pde_schrodinger"
+  group: pde-8-10
+  type: test
+  reward_scale: 0.0001
+  episode_sparsity: 5
+  random_score: -6.3e+6 # - starting | real - -5.e+07
+  expert_score: -2146.7326
+# pde_burgers: # Not ready
+#   path: "DPTDataset/controlgym/pde_burgers"
+#   group: pde-8-10
+#   type: default
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -42640.3
+#   expert_score: -262.16
+# pde_kuramoto_sivashinsky: # Not ready
+#   path: "DPTDataset/controlgym/pde_kuramoto_sivashinsky"
+#   group: pde-8-10
+#   type: test
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -2.03008e+07
+#   expert_score: null
+# pde_fisher: # Not ready
+#   path: "DPTDataset/controlgym/pde_fisher"
+#   group: pde-8-10
+#   type: test
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -3.09988e+149
+#   expert_score: null
+# pde_allen_cahn: # Not ready
+#   path: "DPTDataset/controlgym/pde_allen_cahn"
+#   group: pde-?-?
+#   type: default
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -42161
+#   expert_score: -11616.56
+# pde_korteweg_de_vries: # Not ready
+#   path: "DPTDataset/controlgym/pde_korteweg_de_vries"
+#   group: pde-8-10
+#   type: default
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -30016
+#   expert_score: -1349.74
+# pde_cahn_hilliard: # Not ready
+#   path: "DPTDataset/controlgym/pde_cahn_hilliard"
+#   group: pde-?-?
+#   type: default
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -19222.3
+#   expert_score: -6605.26
+# pde_ginzburg_landau: # Not ready
+#   path: "DPTDataset/controlgym/pde_ginzburg_landau"
+#   group: pde-?-?
+#   type: test
+#   reward_scale: null
+#   episode_sparsity: 5
+#   random_score: # - starting | real - -53195.7
+#   expert_score: -6015.15

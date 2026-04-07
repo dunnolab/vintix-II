@@ -1,0 +1,398 @@
+s-h0-weak-thrust-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h0-weak-thrust-v1
+  random_score: -0.51
+  reward_scale: 1
+  type: default
+s-h1-thrust-over-ball-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h1-thrust-over-ball-v1
+  random_score: -0.3333333333333333
+  reward_scale: 1
+  type: default
+s-h2-one-wheel-car-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h2-one-wheel-car-v1
+  random_score: 0.012
+  reward_scale: 1
+  type: default
+s-h3-point-the-thruster-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h3-point-the-thruster-v1
+  random_score: 0.012
+  reward_scale: 1
+  type: default
+s-h4-thrust-aim-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h4-thrust-aim-v1
+  random_score: 0.29
+  reward_scale: 1
+  type: default
+s-h5-rotate-fall-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h5-rotate-fall-v1
+  random_score: -0.58
+  reward_scale: 1
+  type: default
+s-h6-unicycle-right-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h6-unicycle-right-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+s-h7-unicycle-left-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h7-unicycle-left-v1
+  random_score: 0.062
+  reward_scale: 1
+  type: default
+s-h8-unicycle-balance-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-s
+  path:  DPTDataset/kinetix/tasks-s/s-h8-unicycle-balance-v1
+  random_score: 0.4
+  reward_scale: 1
+  type: test
+
+
+m-h11-thrust-left-easy-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h11-thrust-left-easy-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+m-h19-thrust-left-very-easy-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h19-thrust-left-very-easy-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+m-h5-angry-birds-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h5-angry-birds-v1
+  random_score: 0.4444
+  reward_scale: 1
+  type: default
+m-arm-right-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-arm-right-v1
+  random_score: 0.111111
+  reward_scale: 1
+  type: default
+m-h12-thrustfall-left-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h12-thrustfall-left-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+m-h7-car-flip-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h7-car-flip-v1
+  random_score: -0.4
+  reward_scale: 1
+  type: default
+m-h2-car-right-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h2-car-right-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+m-h8-weird-vehicle-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h8-weird-vehicle-v1
+  random_score: 0.16
+  reward_scale: 1
+  type: default
+m-h0-unicycle-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h0-unicycle-v1
+  random_score: -0.4
+  reward_scale: 1
+  type: default
+
+# m-h1-car-left-v1:
+#  episode_sparsity: 2
+#  expert_score: 1.0
+#  group: kinetix-m
+#  path:  DPTDataset/kinetix/tasks-m/m-h1-car-left-v1
+#  random_score: 0.0
+#  reward_scale: 1
+#  type: default
+
+m-h14-thrustblock-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h14-thrustblock-v1
+  random_score: -1.0
+  reward_scale: 1
+  type: test
+m-h3-car-thrust-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h3-car-thrust-v1
+  random_score: -0.53
+  reward_scale: 1
+  type: default
+m-h9-spin-the-right-way-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h9-spin-the-right-way-v1
+  random_score: -0.31
+  reward_scale: 1
+  type: default
+m-arm-hard-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-arm-hard-v1
+  random_score: 0.05
+  reward_scale: 1
+  type: test
+m-h10-thrust-right-easy-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h10-thrust-right-easy-v1
+  random_score: 0.05
+  reward_scale: 1
+  type: default
+m-h18-thrust-right-very-easy-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h18-thrust-right-very-easy-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+m-h4-thrust-the-needle-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h4-thrust-the-needle-v1
+  random_score: -0.69
+  reward_scale: 1
+  type: default
+m-arm-left-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-arm-left-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+m-arm-up-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-arm-up-v1
+  random_score: -0.5
+  reward_scale: 1
+  type: default
+m-h13-thrustfall-right-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h13-thrustfall-right-v1
+  random_score: 0.06
+  reward_scale: 1
+  type: default
+m-h6-thrust-over-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-m
+  path:  DPTDataset/kinetix/tasks-m/m-h6-thrust-over-v1
+  random_score: -0.47
+  reward_scale: 1
+  type: default
+
+
+l-chain-lander-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-chain-lander-v1
+  random_score: -0.27
+  reward_scale: 1
+  type: default
+l-mjc-half-cheetah-v1:
+  episode_sparsity: 2
+  expert_score: 0.86
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-half-cheetah-v1
+  random_score: -0.29
+  reward_scale: 1
+  type: default
+l-h7-maze-1-v1:
+  episode_sparsity: 2
+  expert_score: 1
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-h7-maze-1-v1
+  random_score: -0.49
+  reward_scale: 1
+  type: default
+l-pr-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-pr-v1
+  random_score: 0.6
+  reward_scale: 1
+  type: default
+l-h1-car-left-v1:
+  episode_sparsity: 2
+  expert_score: 0.99
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-h1-car-left-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+l-hard-pinball-v1:
+  episode_sparsity: 2
+  expert_score: 0.955
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-hard-pinball-v1
+  random_score: -0.58
+  reward_scale: 1
+  type: test
+l-mjc-swimmer-v1:
+  episode_sparsity: 2
+  expert_score: 0.93
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-swimmer-v1
+  random_score: 0.18
+  reward_scale: 1
+  type: default
+l-h3-car-right-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-h3-car-right-v1
+  random_score: 0.15555555
+  reward_scale: 1
+  type: default
+l-mjc-half-cheetah-easy-v1:
+  episode_sparsity: 2
+  expert_score: 0.99
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-half-cheetah-easy-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+l-mjc-walker-easy-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-walker-easy-v1
+  random_score: 0.133333333
+  reward_scale: 1
+  type: default
+l-chain-thrust-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-chain-thrust-v1
+  random_score: 0.13333333
+  reward_scale: 1
+  type: default
+l-mjc-walker-v1:
+  episode_sparsity: 2
+  expert_score: 0.95
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-walker-v1
+  random_score: -0.29
+  reward_scale: 1
+  type: test
+l-h10-morph-direction-2-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-h10-morph-direction-2-v1
+  random_score: 0.0
+  reward_scale: 1
+  type: default
+l-h9-morph-direction-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-h9-morph-direction-v1
+  random_score: 0.04
+  reward_scale: 1
+  type: default
+l-h14-simple-thruster-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-h14-simple-thruster-v1
+  random_score: -0.355555
+  reward_scale: 1
+  type: default
+l-hard-lunar-lander-v1:
+  episode_sparsity: 2
+  expert_score: 0.97
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-hard-lunar-lander-v1
+  random_score: -0.42
+  reward_scale: 1
+  type: test
+l-mjc-hopper-easy-v1:
+  episode_sparsity: 2
+  expert_score: 0.995
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-hopper-easy-v1
+  random_score: 0.26666666
+  reward_scale: 1
+  type: default
+l-mjc-hopper-v1:
+  episode_sparsity: 2
+  expert_score: 0.98
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-mjc-hopper-v1
+  random_score: -0.333333333
+  reward_scale: 1
+  type: default
+l-grasp-easy-v1:
+  episode_sparsity: 2
+  expert_score: 1.0
+  group: kinetix-l
+  path:  DPTDataset/kinetix/tasks-l/l-grasp-easy-v1
+  random_score: -0.43
+  reward_scale: 1
+  type: default

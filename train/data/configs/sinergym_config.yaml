@@ -1,0 +1,264 @@
+5zone-cool_dec_jan_feb:
+  episode_sparsity: 7
+  expert_score: -130
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-cool_dec_jan_feb"
+  random_score: -300
+  reward_scale: 1
+  type: default
+5zone-cool_jun_jul_aug:
+  episode_sparsity: 7
+  expert_score: -118
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-cool_jun_jul_aug"
+  random_score: -300
+  reward_scale: 1
+  type: default
+5zone-cool_mar_apr_may:
+  episode_sparsity: 7
+  expert_score: -50
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-cool_mar_apr_may"
+  random_score: -300
+  reward_scale: 1
+  type: default
+5zone-cool_oct_nov:
+  episode_sparsity: 7
+  expert_score: -58
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-cool_oct_nov"
+  random_score: -300
+  reward_scale: 1
+  type: default
+5zone-cool_sep:
+  episode_sparsity: 7
+  expert_score: -105
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-cool_sep"
+  random_score: -320
+  reward_scale: 1
+  type: default
+5zone-hot_dec_jan_feb:
+  episode_sparsity: 7
+  expert_score: -50
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-hot_dec_jan_feb"
+  random_score: -300
+  reward_scale: 1
+  type: default
+5zone-hot_jun_jul_aug:
+  episode_sparsity: 7
+  expert_score: -127
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-hot_jun_jul_aug"
+  random_score: -230
+  reward_scale: 1
+  type: default
+5zone-hot_mar_apr_may:
+  episode_sparsity: 7
+  expert_score: -90
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-hot_mar_apr_may"
+  random_score: -380
+  reward_scale: 1
+  type: default
+5zone-hot_oct_nov:
+  episode_sparsity: 7
+  expert_score: -50
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-hot_oct_nov"
+  random_score: -350
+  reward_scale: 1
+  type: default
+5zone-hot_sep:
+  episode_sparsity: 7
+  expert_score: -120
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-hot_sep"
+  random_score: -240
+  reward_scale: 1
+  type: default
+5zone-mixed_dec_jan_feb:
+  episode_sparsity: 7
+  expert_score: -173
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-mixed_dec_jan_feb"
+  random_score: -320
+  reward_scale: 1
+  type: test
+5zone-mixed_jun_jul_aug:
+  episode_sparsity: 7
+  expert_score: -110
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-mixed_jun_jul_aug"
+  random_score: -240
+  reward_scale: 1
+  type: test
+5zone-mixed_mar_apr_may:
+  episode_sparsity: 7
+  expert_score: -90
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-mixed_mar_apr_may"
+  random_score: -330
+  reward_scale: 1
+  type: test
+5zone-mixed_oct_nov:
+  episode_sparsity: 7
+  expert_score: -80
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-mixed_oct_nov"
+  random_score: -300
+  reward_scale: 1
+  type: test
+5zone-mixed_sep:
+  episode_sparsity: 7
+  expert_score: -104
+  group: 5zone
+  path: "DPTDataset/sinergym/5zone-mixed_sep"
+  random_score: -250
+  reward_scale: 1
+  type: test
+warehouse-cool_apr_may:
+  episode_sparsity: 7
+  expert_score: -120
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-cool_apr_may"
+  random_score: -290
+  reward_scale: 1
+  type: default
+warehouse-cool_dec_jan_feb:
+  episode_sparsity: 7
+  expert_score: -300
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-cool_dec_jan_feb"
+  random_score: -700
+  reward_scale: 1
+  type: default
+warehouse-cool_mar:
+  episode_sparsity: 7
+  expert_score: -230
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-cool_mar"
+  random_score: -665
+  reward_scale: 1
+  type: default
+warehouse-cool_nov:
+  episode_sparsity: 7
+  expert_score: -180
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-cool_nov"
+  random_score: -500
+  reward_scale: 1
+  type: default
+warehouse-cool_oct:
+  episode_sparsity: 7
+  expert_score: -90
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-cool_oct"
+  random_score: -250
+  reward_scale: 1
+  type: default
+warehouse-hot_apr_may:
+  episode_sparsity: 7
+  expert_score: -400
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_apr_may"
+  random_score: -1300
+  reward_scale: 1
+  type: default
+warehouse-hot_dec_jan_feb:
+  episode_sparsity: 7
+  expert_score: -80
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_dec_jan_feb"
+  random_score: -175
+  reward_scale: 1
+  type: default
+warehouse-hot_jun_jul_aug:
+  episode_sparsity: 7
+  expert_score: -500
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_jun_jul_aug"
+  random_score: -1000
+  reward_scale: 1
+  type: default
+warehouse-hot_mar:
+  episode_sparsity: 7
+  expert_score: -73
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_mar"
+  random_score: -230
+  reward_scale: 1
+  type: default
+warehouse-hot_nov:
+  episode_sparsity: 7
+  expert_score: -100
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_nov"
+  random_score: -530
+  reward_scale: 1
+  type: default
+warehouse-hot_oct:
+  episode_sparsity: 7
+  expert_score: -360
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_oct"
+  random_score: -1100
+  reward_scale: 1
+  type: default
+warehouse-hot_sep:
+  episode_sparsity: 7
+  expert_score: -415
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-hot_sep"
+  random_score: -860
+  reward_scale: 1
+  type: default
+warehouse-mixed_apr_may:
+  episode_sparsity: 7
+  expert_score: -145
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-mixed_apr_may"
+  random_score: -290
+  reward_scale: 1
+  type: test
+warehouse-mixed_dec_jan_feb:
+  episode_sparsity: 7
+  expert_score: -345
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-mixed_dec_jan_feb"
+  random_score: -800
+  reward_scale: 1
+  type: test
+warehouse-mixed_jul_aug:
+  episode_sparsity: 7
+  expert_score: -340
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-mixed_jul_aug"
+  random_score: -650
+  reward_scale: 1
+  type: test
+warehouse-mixed_jun:
+  episode_sparsity: 7
+  expert_score: -180
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-mixed_jun"
+  random_score: -370
+  reward_scale: 1
+  type: test
+warehouse-mixed_mar:
+  episode_sparsity: 7
+  expert_score: -250
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-mixed_mar"
+  random_score: -660
+  reward_scale: 1
+  type: test
+warehouse-mixed_sep:
+  episode_sparsity: 7
+  expert_score: -200
+  group: warehouse
+  path: "DPTDataset/sinergym/warehouse-mixed_sep"
+  random_score: -340
+  reward_scale: 1
+  type: test

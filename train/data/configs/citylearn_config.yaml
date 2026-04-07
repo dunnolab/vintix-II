@@ -1,0 +1,192 @@
+2022_phase_1_task_00:
+  path: "DPTDataset/citylearn/2022_phase_1_task_00"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2212.622
+  expert_score: -1048.304
+2022_phase_1_task_01:
+  path: "DPTDataset/citylearn/2022_phase_1_task_01"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2017.027
+  expert_score: -831.382
+2022_phase_1_task_02:
+  path: "DPTDataset/citylearn/2022_phase_1_task_02"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1607.694
+  expert_score: -546.382
+2022_phase_1_task_03:
+  path: "DPTDataset/citylearn/2022_phase_1_task_03"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1602.172
+  expert_score: -506.776
+2022_phase_1_task_04:
+  path: "DPTDataset/citylearn/2022_phase_1_task_04"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.3
+  episode_sparsity: 5
+  random_score: -2097.761
+  expert_score: -1054.447
+2022_phase_1_task_05:
+  path: "DPTDataset/citylearn/2022_phase_1_task_05"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2254.463
+  expert_score: -1238.112
+2022_phase_1_task_06:
+  path: "DPTDataset/citylearn/2022_phase_1_task_06"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.3
+  episode_sparsity: 5
+  random_score: -1862.427
+  expert_score: -833.582
+2022_phase_1_task_07:
+  path: "DPTDataset/citylearn/2022_phase_1_task_07"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1511.049
+  expert_score: -433.656
+2022_phase_1_task_08:
+  path: "DPTDataset/citylearn/2022_phase_1_task_08"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.4
+  episode_sparsity: 5
+  random_score: -1325.622
+  expert_score: -226.052
+2022_phase_1_task_09:
+  path: "DPTDataset/citylearn/2022_phase_1_task_09"
+  group: 2022_phase_1
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1518.096
+  expert_score: -453.058
+2022_phase_1_task_10:
+  path: "DPTDataset/citylearn/2022_phase_1_task_10"
+  group: 2022_phase_1
+  type: test
+  reward_scale: 0.3
+  episode_sparsity: 5
+  random_score: -1833.117
+  expert_score: -702.245
+2022_phase_1_task_11:
+  path: "DPTDataset/citylearn/2022_phase_1_task_11"
+  group: 2022_phase_1
+  type: test
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2386.111
+  expert_score: -1262.080
+2022_phase_2_task_00:
+  path: "DPTDataset/citylearn/2022_phase_2_task_00"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2364.961
+  expert_score: -1232.097
+2022_phase_2_task_01:
+  path: "DPTDataset/citylearn/2022_phase_2_task_01"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2086.077
+  expert_score: -947.914
+2022_phase_2_task_02:
+  path: "DPTDataset/citylearn/2022_phase_2_task_02"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1678.496
+  expert_score: -594.029
+2022_phase_2_task_03:
+  path: "DPTDataset/citylearn/2022_phase_2_task_03"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1780.217
+  expert_score: -745.086
+2022_phase_2_task_04:
+  path: "DPTDataset/citylearn/2022_phase_2_task_04"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.2
+  episode_sparsity: 5
+  random_score: -2408.561
+  expert_score: -1389.273
+2022_phase_2_task_05:
+  path: "DPTDataset/citylearn/2022_phase_2_task_05"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.2
+  episode_sparsity: 5
+  random_score: -2603.971
+  expert_score: -1698.180
+2022_phase_2_task_06:
+  path: "DPTDataset/citylearn/2022_phase_2_task_06"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -1965.722
+  expert_score: -934.717
+2022_phase_2_task_07:
+  path: "DPTDataset/citylearn/2022_phase_2_task_07"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1568.870
+  expert_score: -430.433
+2022_phase_2_task_08:
+  path: "DPTDataset/citylearn/2022_phase_2_task_08"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.4
+  episode_sparsity: 5
+  random_score: -1270.234
+  expert_score: -241.253
+2022_phase_2_task_09:
+  path: "DPTDataset/citylearn/2022_phase_2_task_09"
+  group: 2022_phase_2
+  type: default
+  reward_scale: 0.35
+  episode_sparsity: 5
+  random_score: -1504.472
+  expert_score: -423.529
+2022_phase_2_task_10:
+  path: "DPTDataset/citylearn/2022_phase_2_task_10"
+  group: 2022_phase_2
+  type: test
+  reward_scale: 0.3
+  episode_sparsity: 5
+  random_score: -1724.464
+  expert_score: -611.275
+2022_phase_2_task_11:
+  path: "DPTDataset/citylearn/2022_phase_2_task_11"
+  group: 2022_phase_2
+  type: test
+  reward_scale: 0.25
+  episode_sparsity: 5
+  random_score: -2143.675
+  expert_score: -967.441

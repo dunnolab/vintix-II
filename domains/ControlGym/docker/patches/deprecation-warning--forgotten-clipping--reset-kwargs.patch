@@ -1,0 +1,51 @@
+From 1ec231a95bdb86427f7e3905f178223522292da0 Mon Sep 17 00:00:00 2001
+From: Alexander Serkov <32331578+setday@users.noreply.github.com>
+Date: Fri, 29 Aug 2025 12:41:51 +0300
+Subject: [PATCH] Fix deprecation warning, add forgotten clipping and reset
+
+---
+ controlgym/envs/linear_control.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/controlgym/envs/linear_control.py b/controlgym/envs/linear_control.py
+index 5ffd6aa..a7bcda5 100644
+--- a/controlgym/envs/linear_control.py
++++ b/controlgym/envs/linear_control.py
+@@ -77,7 +77,8 @@ class LinearControlEnv(gymnasium.Env):
+         self.id = id
+         self.category = "linear"
+ 
+-        with pkg_resources.path(linear_control_src, f"{self.id}.mat") as mat_path:
++        mat_traversable = pkg_resources.files(linear_control_src) / f"{self.id}.mat"
++        with pkg_resources.as_file(mat_traversable) as mat_path:
+             assert mat_path.exists(), "Environment id does not exist!"
+             # load the environment mat file
+             env = sio.loadmat(str(mat_path))
+@@ -184,6 +185,7 @@ class LinearControlEnv(gymnasium.Env):
+ 
+         # generate the observation
+         observation = self._get_obs(disturbance)
++        observation = np.clip(observation, -self.observation_limit, self.observation_limit)
+         output = self._get_output(action, disturbance)
+ 
+         # step the system dynamics forward for one discrete step
+@@ -209,7 +211,7 @@ class LinearControlEnv(gymnasium.Env):
+         # return the observation and stage cost
+         return observation, reward, terminated, truncated, info
+ 
+-    def reset(self, seed: int = None, state: np.ndarray[float] = None):
++    def reset(self, seed: int = None, state: np.ndarray[float] = None, **kwargs):
+         """Resets the environment to an initial internal state, returning an initial observation and info.
+ 
+         This method generates a new starting state often with some randomness to ensure that the agent explores the
+@@ -253,6 +255,7 @@ class LinearControlEnv(gymnasium.Env):
+         )
+         # generate the observation
+         observation = self._get_obs(w)
++        observation = np.clip(observation, -self.observation_limit, self.observation_limit)
+         info = {"state": self.state}
+ 
+         self.step_count = 0
+-- 
+2.40.1.windows.1
+

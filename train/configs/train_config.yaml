@@ -1,0 +1,79 @@
+# dataloader config
+data_dir: "/home/jovyan/foundation_datasets_new"
+context_len: 4096
+trajectory_sparsity: 800
+ignore_episode_sparsity: False
+preload: False
+ic_treshold: 0.3
+last_frac: null
+exp_treshold: 0.75
+permute: True
+
+# model config
+action_emb_dim: 767
+observation_emb_dim: 767
+reward_emb_dim: 2
+hidden_dim: 1536
+transformer_depth: 16
+transformer_heads: 24
+attn_dropout: 0.0
+residual_dropout: 0.0
+normalize_qk: True
+bias: True
+parallel_residual: False
+shared_attention_norm: False
+norm_class: "LayerNorm"
+mlp_class: "GptNeoxMLP"
+intermediate_size: 6144
+inner_ep_pos_enc: False
+norm_acs: False
+norm_obs: True
+
+# optimizer config
+optimizer: "Adam"
+lr: 5e-5
+betas: [0.9, 0.99]
+weight_decay: 1e-4
+precision: "bf16"
+clip_grad: 2.5
+grad_accum_steps: 1
+warmup_ratio: 0.006
+
+# training config
+local_rank: 0
+epochs: 150
+batch_size: 8
+eval_every: 6
+val_max_trans: 10000
+smooth_win: 8
+save_every: 3
+save_dir: "/home/jovyan/found_model_checkpoints/"
+stats_path: "/home/jovyan/foundation_datasets_new/stats.json"
+load_ckpt: null
+start_epoch: 0
+seed: 5
+
+# Add bos
+add_bos: True
+trans_prior: False
+
+# Dataset config
+dataset_config_paths:
+ - "vintix/data/configs/metaworld_config.yaml"
+ - "vintix/data/configs/mujoco_config.yaml"
+ - "vintix/data/configs/ib_config.yaml"
+ - "vintix/data/configs/bidex_config.yaml"
+ - "vintix/data/configs/humenv_config.yaml"
+ - "vintix/data/configs/kinetix_config.yaml"
+ - "vintix/data/configs/metadrive_config.yaml"
+
+ - "vintix/data/configs/citylearn_config.yaml"
+ - "vintix/data/configs/controlgym_config.yaml"
+ - "vintix/data/configs/sinergym_config.yaml"
+
+
+# wandb config
+project: "foundation_rl"
+group: "dpt_fm"
+# name: "frl_d16h24h1536c4096_dpt_fm_10domains"
+name: "frl_d16h24h1536c4096_dpt_fm_10domains_acspadslice"

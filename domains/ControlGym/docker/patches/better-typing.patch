@@ -1,0 +1,728 @@
+From ad0b08f39647ef4e7003010ae8e73590f69367a5 Mon Sep 17 00:00:00 2001
+From: Alexander Serkov <32331578+setday@users.noreply.github.com>
+Date: Fri, 29 Aug 2025 12:51:40 +0300
+Subject: [PATCH] Improve typing
+
+---
+ controlgym/controllers/lqg.py                 | 26 +++++++++----
+ controlgym/controllers/lqr.py                 | 18 ++++++---
+ controlgym/envs/allen_cahn.py                 | 15 ++++---
+ controlgym/envs/burgers.py                    | 17 +++++---
+ controlgym/envs/cahn_hilliard.py              | 15 ++++---
+ .../envs/convection_diffusion_reaction.py     | 23 ++++++-----
+ controlgym/envs/fisher.py                     | 15 ++++---
+ controlgym/envs/ginzburg_landau.py            | 15 ++++---
+ controlgym/envs/korteweg_de_vries.py          | 15 ++++---
+ controlgym/envs/kuramoto_sivashinsky.py       | 15 ++++---
+ controlgym/envs/pde.py                        | 39 ++++++++++++-------
+ controlgym/envs/schrodinger.py                | 23 ++++++-----
+ controlgym/envs/wave.py                       | 23 ++++++-----
+ 13 files changed, 169 insertions(+), 90 deletions(-)
+
+diff --git a/controlgym/controllers/lqg.py b/controlgym/controllers/lqg.py
+index 18dfd5e..babd0db 100644
+--- a/controlgym/controllers/lqg.py
++++ b/controlgym/controllers/lqg.py
+@@ -1,11 +1,17 @@
+-import numpy as np
++
+ import logging
+-from scipy.linalg import solve_discrete_are, inv, LinAlgError
++from typing import Optional
++
++import numpy as np
++import numpy.typing as npt
++
+ import torch
+ 
++from scipy.linalg import solve_discrete_are, inv, LinAlgError
++
+ 
+-def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float], 
+-              R: np.ndarray[float], S: np.ndarray[float]):
++def _lqr_gain(A: npt.NDArray[np.float64], B: npt.NDArray[np.float64], Q: npt.NDArray[np.float64],
++              R: npt.NDArray[np.float64], S: npt.NDArray[np.float64]):
+     """Private function to compute the gain matrices of the LQR controller
+         using algebraic Riccati equation (ARE).
+ 
+@@ -44,7 +50,7 @@ def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float],
+         gain_lqt = T1inv @ B.T @ T2inv @ Q
+     return gain_lqr, gain_lqt
+ 
+-def _kf_gain(A: np.ndarray[float], C: np.ndarray[float], W: np.ndarray[float], V: np.ndarray[float]):
++def _kf_gain(A: npt.NDArray[np.float64], C: npt.NDArray[np.float64], W: npt.NDArray[np.float64], V: npt.NDArray[np.float64]):
+     """Private function to compute the gain matrices of the Kalman filter
+             using algebraic Riccati equation (ARE).
+ 
+@@ -171,7 +177,7 @@ class LQG:
+ 
+         self.traj = None
+ 
+-    def select_action(self, est_state: np.ndarray[float]):
++    def select_action(self, est_state: npt.NDArray[np.float64]):
+         """Compute the LQG control input using estimated state.
+ 
+         Args:
+@@ -180,12 +186,14 @@ class LQG:
+         Returns:
+             action: ndarray[float], control input.
+         """
++        assert self.gain_lqr is not None and self.gain_lqt is not None
++
+         if self.target_state is not None:
+             return self.gain_lqr @ est_state + self.gain_lqt @ self.target_state
+         else:
+             return self.gain_lqr @ est_state
+ 
+-    def evolve_state_estimate(self, est_state: np.ndarray[float], action: np.ndarray[float], observation: np.ndarray[float]):
++    def evolve_state_estimate(self, est_state: npt.NDArray[np.float64], action: npt.NDArray[np.float64], observation: npt.NDArray[np.float64]):
+         """Update the state estimate using the Kalman filter with new observation and control input.
+ 
+         Args:
+@@ -196,9 +204,11 @@ class LQG:
+         Returns:
+             est_state: ndarray[float], updated state estimate.
+         """
++        assert self.gain_kf is not None
++
+         return (self.env.A - self.gain_kf @ self.env.C) @ est_state + self.env.B2 @ action + self.gain_kf @ observation
+ 
+-    def run(self, state: np.ndarray[float] = None, seed: int = None):
++    def run(self, state: Optional[npt.NDArray[np.float64]] = None, seed: Optional[int] = None):
+         """Run a trajectory of the environment using the LQG controller,
+             calculate the H2 cost, and save the state trajectory to env.state_traj.
+             The trajectory is terminated when the environment returns a done signal (most likely
+diff --git a/controlgym/controllers/lqr.py b/controlgym/controllers/lqr.py
+index c6ed964..cef766f 100644
+--- a/controlgym/controllers/lqr.py
++++ b/controlgym/controllers/lqr.py
+@@ -1,12 +1,18 @@
++
++import logging
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from numpy.linalg import inv
+-import logging
+ from scipy.linalg import solve_discrete_are, LinAlgError
+ 
+ 
+-def _lqr_gain(A: np.ndarray[float], B: np.ndarray[float], Q: np.ndarray[float], 
+-              R: np.ndarray[float], S: np.ndarray[float]):
++def _lqr_gain(A: npt.NDArray[np.float64], B: npt.NDArray[np.float64], Q: npt.NDArray[np.float64],
++              R: npt.NDArray[np.float64], S: npt.NDArray[np.float64]):
+     """Private function to compute the gain matrices of the LQR controller
+         using algebraic Riccati equation (ARE).
+ 
+@@ -112,7 +118,7 @@ class LQR:
+         # compute the LQR gain
+         self.gain_lqr, self.gain_lqt = _lqr_gain(A, B2, Q, R, S)
+ 
+-    def select_action(self, state: np.ndarray[float]):
++    def select_action(self, state: npt.NDArray[np.float64]):
+         """Compute the LQR control input using state information.
+ 
+         Args:
+@@ -121,13 +127,15 @@ class LQR:
+         Returns:
+             action: ndarray[float], control input.
+         """
++        assert self.gain_lqr is not None and self.gain_lqt is not None
++
+         # PDE settings where the objective is to track a target state
+         if self.target_state is not None:
+             return self.gain_lqr @ state + self.gain_lqt @ self.target_state
+         else:
+             return self.gain_lqr @ state
+ 
+-    def run(self, state: np.ndarray[float] = None, seed: int = None):
++    def run(self, state: Optional[npt.NDArray[np.float64]] = None, seed: Optional[int] = None):
+         """Run a trajectory of the environment using the LQR controller,
+             calculate the H2 cost, and save the state trajectory to env.state_traj.
+             The trajectory is terminated when the environment returns a done signal (most likely
+diff --git a/controlgym/envs/allen_cahn.py b/controlgym/envs/allen_cahn.py
+index 2f56af0..7f8cde5 100644
+--- a/controlgym/envs/allen_cahn.py
++++ b/controlgym/envs/allen_cahn.py
+@@ -1,5 +1,10 @@
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -50,7 +55,7 @@ class AllenCahnEnv(PDE):
+         sample_time: float = 0.01,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_offset_mean: float = 0.0,
+         init_offset_width: float = 0.2,
+         diffusivity_constant: float = 1e-4,
+@@ -61,10 +66,10 @@ class AllenCahnEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/burgers.py b/controlgym/envs/burgers.py
+index 215215a..c0b4938 100644
+--- a/controlgym/envs/burgers.py
++++ b/controlgym/envs/burgers.py
+@@ -1,5 +1,10 @@
+-import torch
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
++import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -52,7 +57,7 @@ class BurgersEnv(PDE):
+         sample_time: float = 0.05,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         init_spread_mean: float = 0.05,
+@@ -64,10 +69,10 @@ class BurgersEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/cahn_hilliard.py b/controlgym/envs/cahn_hilliard.py
+index 2d858c6..78bb173 100644
+--- a/controlgym/envs/cahn_hilliard.py
++++ b/controlgym/envs/cahn_hilliard.py
+@@ -1,5 +1,10 @@
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -52,7 +57,7 @@ class CahnHilliardEnv(PDE):
+         sample_time: float = 0.01,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         diffusivity_constant: float = 1.0,
+@@ -63,10 +68,10 @@ class CahnHilliardEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/convection_diffusion_reaction.py b/controlgym/envs/convection_diffusion_reaction.py
+index 0d2e8bd..717fd68 100644
+--- a/controlgym/envs/convection_diffusion_reaction.py
++++ b/controlgym/envs/convection_diffusion_reaction.py
+@@ -1,6 +1,11 @@
++import math
++from typing import Optional, Tuple
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
+-import math
++
+ from controlgym.envs import PDE
+ from controlgym.envs.utils import ft_matrix, ift_matrix
+ 
+@@ -54,11 +59,11 @@ class ConvectionDiffusionReactionEnv(PDE):
+         self,
+         n_steps: int = 100,
+         domain_length: float = 1.0,
+-        integration_time: float = None,  # Use analytical solution to evolve the dynamics
++        integration_time: Optional[float] = None,  # Use analytical solution to evolve the dynamics
+         sample_time: float = 0.1,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         init_spread_mean: float = 0.05,
+@@ -72,10 +77,10 @@ class ConvectionDiffusionReactionEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+@@ -117,7 +122,7 @@ class ConvectionDiffusionReactionEnv(PDE):
+         self.init_spread_width = init_spread_width
+         self.reset()
+ 
+-    def select_init_state(self, init_amplitude=None, init_spread=None):
++    def select_init_state(self, init_amplitude=None, init_spread=None) -> torch.Tensor:
+         """Function to select the initial state of the PDE"""
+         if init_amplitude is None:
+             random_amplitude = (torch.rand(1, generator=self.rng, device=self.device) - 0.5) * self.init_amplitude_width
+@@ -130,7 +135,7 @@ class ConvectionDiffusionReactionEnv(PDE):
+         ) ** (-1)
+         return init_state
+ 
+-    def step(self, action: np.ndarray[float]):
++    def step(self, action: npt.NDArray[np.float64]) -> Tuple[npt.NDArray[np.float64], float, bool, bool, dict]:
+         """Run one timestep of the environment's dynamics using the agent actions and optional disturbance input.
+ 
+         When the end of an episode is reached (``terminated or truncated``), it is necessary to call reset() to
+diff --git a/controlgym/envs/fisher.py b/controlgym/envs/fisher.py
+index 7810516..8e064f0 100644
+--- a/controlgym/envs/fisher.py
++++ b/controlgym/envs/fisher.py
+@@ -1,5 +1,10 @@
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -52,7 +57,7 @@ class FisherEnv(PDE):
+         sample_time: float = 0.05,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         diffusivity_constant: float = 0.0001,
+@@ -63,10 +68,10 @@ class FisherEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/ginzburg_landau.py b/controlgym/envs/ginzburg_landau.py
+index 9a44c43..cc42d35 100644
+--- a/controlgym/envs/ginzburg_landau.py
++++ b/controlgym/envs/ginzburg_landau.py
+@@ -1,5 +1,10 @@
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -51,7 +56,7 @@ class GinzburgLandauEnv(PDE):
+         sample_time: float = 0.1,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 0.1,
+         init_amplitude_width: float = 0.05,
+         init_spread_mean: float = 20.0,
+@@ -62,10 +67,10 @@ class GinzburgLandauEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/korteweg_de_vries.py b/controlgym/envs/korteweg_de_vries.py
+index 49ba83a..6227e53 100644
+--- a/controlgym/envs/korteweg_de_vries.py
++++ b/controlgym/envs/korteweg_de_vries.py
+@@ -1,5 +1,10 @@
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -49,7 +54,7 @@ class KortewegDeVriesEnv(PDE):
+         sample_time: float = 0.01,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 2.0,
+         init_amplitude_width: float = 1.0,
+         n_state: int = 128,
+@@ -58,10 +63,10 @@ class KortewegDeVriesEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/kuramoto_sivashinsky.py b/controlgym/envs/kuramoto_sivashinsky.py
+index 3af35e0..fefe61c 100644
+--- a/controlgym/envs/kuramoto_sivashinsky.py
++++ b/controlgym/envs/kuramoto_sivashinsky.py
+@@ -1,5 +1,10 @@
++from typing import Optional
++
+ import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ 
+ 
+@@ -49,7 +54,7 @@ class KuramotoSivashinskyEnv(PDE):
+         sample_time: float = 0.5,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         n_state: int = 256,
+@@ -58,10 +63,10 @@ class KuramotoSivashinskyEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         PDE.__init__(
+diff --git a/controlgym/envs/pde.py b/controlgym/envs/pde.py
+index f34a716..d2519f0 100644
+--- a/controlgym/envs/pde.py
++++ b/controlgym/envs/pde.py
+@@ -1,8 +1,13 @@
+-import numpy as np
+-import gymnasium
+ import math
++from typing import Optional, Tuple
++
++import numpy as np
++import numpy.typing as npt
++
+ import torch
+ 
++import gymnasium
++
+ 
+ class PDE(gymnasium.Env):
+     """
+@@ -48,21 +53,21 @@ class PDE(gymnasium.Env):
+         id: str,
+         n_steps: int,
+         domain_length: float,
+-        integration_time: float,
++        integration_time: Optional[float],
+         sample_time: float,
+         process_noise_cov: float,
+         sensor_noise_cov: float,
+-        target_state: np.ndarray[float],
++        target_state: Optional[npt.NDArray[np.float64]],
+         n_state: int,
+         n_observation: int,
+         n_action: int,
+         control_sup_width: float,
+         Q_weight: float,
+         R_weight: float,
+-        action_limit: float,
+-        observation_limit: float,
+-        reward_limit: float,
+-        seed: int,
++        action_limit: Optional[float],
++        observation_limit: Optional[float],
++        reward_limit: Optional[float],
++        seed: Optional[int],
+         device: str = 'cpu',
+         dtype: torch.dtype = torch.float64
+     ):
+@@ -78,7 +83,7 @@ class PDE(gymnasium.Env):
+         # check whether sample_time is a integer multiple of integration_time
+         if integration_time is not None:
+             assert (
+-                round(self.sample_time * 1e8) % round(self.integration_time * 1e8) == 0
++                round(sample_time * 1e8) % round(integration_time * 1e8) == 0
+             ), "sample_time must be a integer multiple of integration_time."
+ 
+         self.process_noise_cov = process_noise_cov
+@@ -130,13 +135,13 @@ class PDE(gymnasium.Env):
+             low=-self.action_limit,
+             high=self.action_limit,
+             shape=(self.n_action,),
+-            dtype=float,
++            dtype=np.float64,
+         )
+         self.observation_space = gymnasium.spaces.Box(
+             low=-self.observation_limit,
+             high=self.observation_limit,
+             shape=(self.n_observation,),
+-            dtype=float,
++            dtype=np.float64,
+         )
+         self.reward_range = (-self.reward_limit, self.reward_limit)
+ 
+@@ -145,7 +150,7 @@ class PDE(gymnasium.Env):
+ 
+         self.state = torch.zeros(self.n_state, device=self.device, dtype=self.dtype)
+ 
+-    def step(self, action: np.ndarray[float]):
++    def step(self, action: npt.NDArray[np.float64]) -> Tuple[npt.NDArray[np.float64], float, bool, bool, dict]:
+         """Run one timestep of the environment's dynamics using the agent actions.
+ 
+         When the end of an episode is reached (``terminated or truncated``), it is necessary to call reset() to
+@@ -167,6 +172,9 @@ class PDE(gymnasium.Env):
+             info (dict): Contains auxillary information. In this case, it contains the state of the system to be utlized
+                         for deploying state-feedback controllers.
+         """
++        # check whether is not None
++        assert self.integration_time is not None, "Integration time can't be None in non-linear pde's"
++
+         # check whether the input control is of the right dimension
+         assert action.shape == (
+             self.n_action,
+@@ -268,7 +276,10 @@ class PDE(gymnasium.Env):
+         # return the observation and stage cost
+         return observation, reward, terminated, truncated, info
+ 
+-    def reset(self, seed: int = None, state: torch.Tensor = None, **kwargs):
++    def select_init_state(self) -> torch.Tensor:
++        raise NotImplementedError()
++
++    def reset(self, seed: Optional[int] = None, state: Optional[torch.Tensor] = None, **kwargs):
+         """Resets the environment to an initial internal state, returning an initial observation and info.
+ 
+         This method generates a new starting state with some randomness to ensure that the agent explores the
+@@ -312,7 +323,7 @@ class PDE(gymnasium.Env):
+ 
+         return observation, info
+ 
+-    def set_target_state(self, state: np.ndarray[float]):
++    def set_target_state(self, state: npt.NDArray[np.float64]):
+         """Set the target state of the system
+ 
+         Args:
+diff --git a/controlgym/envs/schrodinger.py b/controlgym/envs/schrodinger.py
+index 12f1f98..edce8e0 100644
+--- a/controlgym/envs/schrodinger.py
++++ b/controlgym/envs/schrodinger.py
+@@ -1,6 +1,11 @@
+-import numpy as np
+ import math
++from typing import Optional, Tuple
++
++import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ from controlgym.envs.utils import ft_matrix, ift_matrix
+ 
+@@ -57,11 +62,11 @@ class SchrodingerEnv(PDE):
+         self,
+         n_steps: int = 500,
+         domain_length: float = 1.0,
+-        integration_time: float = None,  # Use analytical solution to evolve the dynamics
++        integration_time: Optional[float] = None,  # Use analytical solution to evolve the dynamics
+         sample_time: float = 0.001,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         init_spread_mean: float = 0.05,
+@@ -75,10 +80,10 @@ class SchrodingerEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = None,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = None,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         self.n_state_half = int(n_state / 2)
+@@ -130,7 +135,7 @@ class SchrodingerEnv(PDE):
+         self.init_spread_width = init_spread_width
+         self.reset()
+ 
+-    def select_init_state(self, init_amplitude=None, init_spread=None):
++    def select_init_state(self, init_amplitude=None, init_spread=None) -> torch.Tensor:
+         """Function to select the initial state of the PDE."""
+         if init_amplitude is None:
+             random_amplitude = (torch.rand(1, generator=self.rng, device=self.device) - 0.5) * self.init_amplitude_width
+@@ -145,7 +150,7 @@ class SchrodingerEnv(PDE):
+         init_state = torch.cat((init_u, init_v))
+         return init_state
+ 
+-    def step(self, action: np.ndarray[float]):
++    def step(self, action: npt.NDArray[np.float64]) -> Tuple[npt.NDArray[np.float64], float, bool, bool, dict]:
+         """Run one timestep of the environment's dynamics using the agent actions and optional disturbance input.
+ 
+         When the end of an episode is reached (``terminated or truncated``), it is necessary to call reset() to
+diff --git a/controlgym/envs/wave.py b/controlgym/envs/wave.py
+index e6421de..29a520a 100644
+--- a/controlgym/envs/wave.py
++++ b/controlgym/envs/wave.py
+@@ -1,6 +1,11 @@
+-import numpy as np
+ import math
++from typing import Optional, Tuple
++
++import numpy as np
++import numpy.typing as npt
++
+ import torch
++
+ from controlgym.envs import PDE
+ from controlgym.envs.utils import ft_matrix, ift_matrix
+ 
+@@ -50,11 +55,11 @@ class WaveEnv(PDE):
+         self,
+         n_steps: int = 200,
+         domain_length: float = 1.0,
+-        integration_time: float = None,  # Use analytical solution to evolve the dynamics
++        integration_time: Optional[float] = None,  # Use analytical solution to evolve the dynamics
+         sample_time: float = 0.1,
+         process_noise_cov: float = 0.0,
+         sensor_noise_cov: float = 0.25,
+-        target_state: np.ndarray[float] = None,
++        target_state: Optional[npt.NDArray[np.float64]] = None,
+         init_amplitude_mean: float = 1.0,
+         init_amplitude_width: float = 0.2,
+         init_spread_mean: float = 0.05,
+@@ -66,10 +71,10 @@ class WaveEnv(PDE):
+         control_sup_width: float = 0.1,
+         Q_weight: float = 1.0,
+         R_weight: float = 1.0,
+-        action_limit: float = None,
+-        observation_limit: float = None,
+-        reward_limit: float = 1e15,
+-        seed: int = None,
++        action_limit: Optional[float] = None,
++        observation_limit: Optional[float] = None,
++        reward_limit: Optional[float] = 1e15,
++        seed: Optional[int] = None,
+         device: str = 'cpu',
+     ):
+         self.n_state_half = int(n_state / 2)
+@@ -121,7 +126,7 @@ class WaveEnv(PDE):
+         self.init_spread_width = init_spread_width
+         self.reset()
+ 
+-    def select_init_state(self, init_amplitude=None, init_spread=None):
++    def select_init_state(self, init_amplitude=None, init_spread=None) -> torch.Tensor:
+         """Function to select the initial state of the PDE."""
+         if init_amplitude is None:
+             random_amplitude = (torch.rand(1, generator=self.rng, device=self.device) - 0.5) * self.init_amplitude_width
+@@ -136,7 +141,7 @@ class WaveEnv(PDE):
+         init_state = torch.cat((init_u, init_v))
+         return init_state
+ 
+-    def step(self, action: np.ndarray[float]):
++    def step(self, action: npt.NDArray[np.float64]) -> Tuple[npt.NDArray[np.float64], float, bool, bool, dict]:
+         """Run one timestep of the environment's dynamics using the agent actions and optional disturbance input.
+ 
+         When the end of an episode is reached (``terminated or truncated``), it is necessary to call reset() to
+-- 
+2.40.1.windows.1
+

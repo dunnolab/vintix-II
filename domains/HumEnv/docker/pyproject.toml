@@ -1,0 +1,33 @@
+[project]
+name = "domain"
+description = "Domain Discovery for Vintix II model"
+requires-python =">=3.8"
+dependencies = [
+    "h5py",
+    "numpy>=2.2.6",
+    "pyrallis",
+    "torch>=2.1.0",
+    "wandb",
+    "scikit-learn>=1.3.0",
+    "pytest",
+    "gymnasium>=0.28.0",
+    "paramiko>=3.4.0",
+    "tqdm",
+    "scipy",
+    "mujoco",
+    "mediapy",
+    "dm_control",
+    "matplotlib",
+    "pyarrow>=21.0.0" 
+]
+authors = [
+    {name = "lyubaykin", email = "lyubaykin@airi.net"}
+]
+dynamic = ["version"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["domain"]
