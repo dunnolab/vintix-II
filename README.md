@@ -3,7 +3,7 @@
 </p> -->
 
 # Vintix II: Decision Pre-Trained Transformer is a Scalable In-Context Reinforcement Learner
-<!-- [![arXiv](https://img.shields.io/badge/arXiv-2501.19400-df2a2a.svg?style=for-the-badge)](https://arxiv.org/abs/2501.19400) -->
+[![arXiv](https://img.shields.io/badge/arXiv-2604.05112-df2a2a.svg?style=for-the-badge)](https://arxiv.org/abs/2604.05112)
 [![HF Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow?style=for-the-badge)](https://huggingface.co/dunnolab/VintixII)
 [![HF Datasets](https://img.shields.io/badge/%F0%9F%A4%97-Datasets-yellow?style=for-the-badge)](https://huggingface.co/datasets/artfawl/VintixDatasetII)
 [![License](https://img.shields.io/github/license/gee1k/uPic?style=for-the-badge)](LICENSE)
@@ -150,14 +150,13 @@ print(f"Rewards per episode for {task_name}: {episode_rewards}")
 
 
 ## Citation
-<!-- If you would like to cite our work, please use the following bibtex
-
+If you would like to cite our work, please use the following bibtex
 ```bibex
-@article{polubarov2025vintix,
-  author={Andrey Polubarov and Nikita Lyubaykin and Alexander Derevyagin and Ilya Zisman and Denis Tarasov and Alexander Nikulin and Vladislav Kurenkov},
-  title={Vintix: Action Model via In-Context Reinforcement Learning},
-  journal={arXiv},
-  volume={2501.19400},
-  year={2025}
+@article{polubarov2026vintixiidecisionpretrained,
+      author={Andrei Polubarov and Lyubaykin Nikita and Alexander Derevyagin and Artyom Grishin and Igor Saprygin and Aleksandr Serkov and Mark Averchenko and Daniil Tikhonov and Maksim Zhdanov and Alexander Nikulin and Ilya Zisman and Albina Klepach and Alexey Zemtsov and Vladislav Kurenkov},
+      title={Vintix II: Decision Pre-Trained Transformer is a Scalable In-Context Reinforcement Learner},
+      journal={arXiv}, 
+      volume={2604.05112},
+      year={2026},
 }
-``` -->
+```
